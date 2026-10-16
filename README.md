@@ -1,4 +1,4 @@
-# AI Tooling Passport
+# CS Scale AI Enablement
 
 A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
 

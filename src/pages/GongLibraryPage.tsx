@@ -68,7 +68,6 @@ export function GongLibraryPage() {
 
       {filteredRecordings.length === 0 ? (
         <EmptyState
-          icon="🎧"
           title="No recordings yet"
           message="Check back once the Gong inventory is published. This library is fully wired for search and phase filtering — it just needs data."
         />

@@ -19,7 +19,6 @@ export function MyToolsPage() {
 
       {favoriteTools.length === 0 ? (
         <EmptyState
-          icon="⭐"
           title="No favorites yet"
           message="Favorite a tool from the Catalog or a phase panel on Home to see it here."
         />

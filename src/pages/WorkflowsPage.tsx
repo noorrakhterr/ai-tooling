@@ -10,7 +10,6 @@ export function WorkflowsPage() {
         </p>
       </div>
       <EmptyState
-        icon="🧭"
         title="Coming soon"
         message="Custom workflows will let you organize favorited tools into your own named task sequences. Not yet available in this prototype."
       />

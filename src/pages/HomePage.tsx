@@ -35,7 +35,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="rounded-xl bg-emerald-400/90 px-4 py-2 text-right text-emerald-950">
-              <p className="text-xs font-semibold">Passport complete 🎉</p>
+              <p className="text-xs font-semibold">Passport complete</p>
             </div>
           )}
         </div>

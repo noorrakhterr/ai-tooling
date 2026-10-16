@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Home', icon: '🏠' },
-  { to: '/catalog', label: 'Tool Catalog', icon: '🧰' },
-  { to: '/gong-library', label: 'Gong Library', icon: '🎧' },
-  { to: '/my-tools', label: 'My Tools', icon: '⭐' },
-  { to: '/workflows', label: 'Workflows', icon: '🧭' },
+  { to: '/', label: 'Home' },
+  { to: '/catalog', label: 'Tool Catalog' },
+  { to: '/gong-library', label: 'Gong Library' },
+  { to: '/my-tools', label: 'My Tools' },
+  { to: '/workflows', label: 'Workflows' },
 ]
 
 export function Sidebar() {
@@ -13,7 +13,9 @@ export function Sidebar() {
     <aside className="flex h-screen w-56 flex-col border-r border-slate-200 bg-white px-4 py-6">
       <div className="mb-8 flex items-center gap-2 px-2">
         <div className="h-7 w-7 rounded-md bg-gradient-to-br from-indigo-500 to-violet-600" />
-        <span className="text-sm font-semibold text-slate-900">AI Tooling Passport</span>
+        <span className="font-heading text-sm font-semibold text-slate-900">
+          CS Scale AI Enablement
+        </span>
       </div>
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map((item) => (
@@ -30,7 +32,6 @@ export function Sidebar() {
               ].join(' ')
             }
           >
-            <span aria-hidden="true">{item.icon}</span>
             {item.label}
           </NavLink>
         ))}

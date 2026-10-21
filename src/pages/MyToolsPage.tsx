@@ -1,12 +1,12 @@
 import { ALL_PHASES } from '../data/phases'
-import { SAMPLE_TOOLS } from '../data/tools'
+import { TOOLS } from '../data/tools'
 import { usePassportStore } from '../state/usePassportStore'
 import { ToolCard } from '../components/ToolCard'
 import { EmptyState } from '../components/EmptyState'
 
 export function MyToolsPage() {
   const favoriteToolIds = usePassportStore((state) => state.favoriteToolIds)
-  const favoriteTools = SAMPLE_TOOLS.filter((tool) => favoriteToolIds.includes(tool.id))
+  const favoriteTools = TOOLS.filter((tool) => favoriteToolIds.includes(tool.id))
 
   return (
     <div className="flex flex-col gap-6">

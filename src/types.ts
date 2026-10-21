@@ -8,7 +8,7 @@ export interface Phase {
   description: string
 }
 
-export type ToolType = 'Gong resource' | 'Gem' | 'Skill' | 'Prompt' | 'Notebook' | 'Other'
+export type ToolType = 'Gong resource' | 'Gem' | 'Agent' | 'Skill' | 'Prompt' | 'Notebook' | 'Other'
 
 export interface Tool {
   id: string
@@ -18,6 +18,8 @@ export interface Tool {
   phaseIds: string[]
   link: string
   owner?: string
+  /** Set when the tool has been announced but isn't available to use yet. */
+  comingSoon?: boolean
 }
 
 export interface Recording {
@@ -26,5 +28,12 @@ export interface Recording {
   customer: string
   callDate: string
   phaseIds: string[]
+  link: string
+}
+
+export interface ReferenceResource {
+  id: string
+  title: string
+  description: string
   link: string
 }

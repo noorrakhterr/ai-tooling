@@ -1,12 +1,17 @@
 import { useMemo, useState } from 'react'
-import { ALL_PHASES } from '../data/phases'
 import { RECORDINGS } from '../data/recordings'
 import { RecordingCard } from '../components/RecordingCard'
 import { EmptyState } from '../components/EmptyState'
 
 export function GongLibraryPage() {
   const [query, setQuery] = useState('')
-  const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
+  const [labelFilter, setLabelFilter] = useState<string | 'all'>('all')
+
+  const allLabels = useMemo(() => {
+    const labels = new Set<string>()
+    RECORDINGS.forEach((recording) => recording.labels.forEach((label) => labels.add(label)))
+    return [...labels].sort()
+  }, [])
 
   const filteredRecordings = useMemo(() => {
     return RECORDINGS.filter((recording) => {
@@ -15,17 +20,17 @@ export function GongLibraryPage() {
         recording.title.toLowerCase().includes(query.toLowerCase()) ||
         (recording.customer?.toLowerCase().includes(query.toLowerCase()) ?? false) ||
         (recording.owner?.toLowerCase().includes(query.toLowerCase()) ?? false)
-      const matchesPhase = phaseFilter === 'all' || recording.phaseIds.includes(phaseFilter)
-      return matchesQuery && matchesPhase
+      const matchesLabel = labelFilter === 'all' || recording.labels.includes(labelFilter)
+      return matchesQuery && matchesLabel
     })
-  }, [query, phaseFilter])
+  }, [query, labelFilter])
 
   return (
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Searchable call recording library, filterable by lifecycle phase.
+          Searchable call recording library, filterable by label.
         </p>
       </div>
 
@@ -40,34 +45,34 @@ export function GongLibraryPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setPhaseFilter('all')}
+            onClick={() => setLabelFilter('all')}
             className={[
               'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-              phaseFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+              labelFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
             ].join(' ')}
           >
-            All phases
+            All labels
           </button>
-          {ALL_PHASES.map((phase) => (
+          {allLabels.map((label) => (
             <button
-              key={phase.id}
+              key={label}
               type="button"
-              onClick={() => setPhaseFilter(phase.id)}
+              onClick={() => setLabelFilter(label)}
               className={[
                 'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                phaseFilter === phase.id
+                labelFilter === label
                   ? 'bg-indigo-600 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
               ].join(' ')}
             >
-              {phase.title}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
       {filteredRecordings.length === 0 ? (
-        <EmptyState title="No recordings match" message="Try a different search term or phase filter." />
+        <EmptyState title="No recordings match" message="Try a different search term or label filter." />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRecordings.map((recording) => (

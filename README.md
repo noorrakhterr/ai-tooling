@@ -20,9 +20,10 @@ A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
    dedicated Passport page keeps showing the full view regardless of
    dismissal.
 2. **A tool catalog** — searchable/filterable by lifecycle phase.
-3. **A Gong recordings library** — searchable/filterable by lifecycle phase,
-   kept fully separate from the passport mechanic. Populated with real call
-   recordings from the team's Gong catalog sheet.
+3. **A Gong recordings library** — searchable and filterable by label (the
+   use-case tags from the team's Gong catalog sheet, e.g. "SBR," "FastPass,"
+   "Gold Scale" — not lifecycle phases), kept fully separate from the
+   passport mechanic. Populated with real call recordings.
 4. **My Tools** — favorited catalog tools and your own uploaded tools
    (stored locally, assignable to one or more phases), grouped by phase.
 5. **Workflows** — a "coming soon" stub for assigning favorited tools to
@@ -51,7 +52,9 @@ A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
   browser's `localStorage` as a data URL; nothing is uploaded anywhere.
 - **The Gong Library holds real call recordings** sourced from the team's
   Gong catalog sheet (`src/data/recordings.ts`), searchable by title,
-  customer, or owner, and filterable by phase. Gong platform tools (AI
+  customer, or owner, and filterable by **label** — free-text use-case tags
+  extracted from the sheet's "Use Case" column (e.g. "SBR," "FastPass"),
+  independent of the passport's lifecycle phases. Gong platform tools (AI
   Assistant, AI Trainer, etc.) live in the Tool Catalog instead, and
   Gong training/FAQ docs live in Home's "How-to guides for self-enablement"
   section.

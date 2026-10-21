@@ -1,5 +1,4 @@
 import type { Recording } from '../types'
-import { getPhaseById } from '../data/phases'
 
 interface RecordingCardProps {
   recording: Recording
@@ -18,15 +17,11 @@ export function RecordingCard({ recording }: RecordingCardProps) {
       )}
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <span>{recording.callDate}</span>
-        {recording.phaseIds.map((phaseId) => {
-          const phase = getPhaseById(phaseId)
-          if (!phase) return null
-          return (
-            <span key={phaseId} className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
-              {phase.title}
-            </span>
-          )
-        })}
+        {recording.labels.map((label) => (
+          <span key={label} className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+            {label}
+          </span>
+        ))}
       </div>
       <a
         href={recording.link}

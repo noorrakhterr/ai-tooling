@@ -30,7 +30,8 @@ export interface Recording {
   /** CSM/owner who ran or recorded the call. */
   owner?: string
   callDate: string
-  phaseIds: string[]
+  /** Free-text labels/use-case tags, as assigned in the Gong catalog sheet — not lifecycle phases. */
+  labels: string[]
   link: string
 }
 

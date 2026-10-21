@@ -1,10 +1,10 @@
 import type { Recording } from '../types'
 
 /**
- * Gong call recordings, sourced from the team's Gong catalog sheet. Only
- * actual customer/internal call recordings live here — Gong platform
- * tools went into the Tool Catalog, and training/FAQ resources went into
- * Home's "How-to guides for self-enablement" section.
+ * Gong call recordings, sourced from the team's Gong catalog sheet. Labels
+ * are the use-case tags from that sheet (not lifecycle phases) — Gong
+ * platform tools went into the Tool Catalog, and training/FAQ resources
+ * went into Home's "How-to guides for self-enablement" section.
  */
 export const RECORDINGS: Recording[] = [
   {
@@ -12,7 +12,7 @@ export const RECORDINGS: Recording[] = [
     title: 'Professional Services Deployment & TAM support',
     owner: 'Iyana Johnson',
     callDate: '2026-09-16',
-    phaseIds: ['closing-out'],
+    labels: ['TAM Support'],
     link: 'https://us-5814.app.gong.io/call?id=5982886860163394973',
   },
   {
@@ -20,7 +20,7 @@ export const RECORDINGS: Recording[] = [
     title: 'IMM/CS',
     owner: 'Noor Akhter',
     callDate: '2026-08-20',
-    phaseIds: ['meeting'],
+    labels: ['IMM/CS'],
     link: 'https://us-5814.app.gong.io/call?id=1278793262274114096',
   },
   {
@@ -28,7 +28,7 @@ export const RECORDINGS: Recording[] = [
     title: 'Gold Scale SLED Call',
     owner: 'Soon Hwang',
     callDate: '2026-08-21',
-    phaseIds: ['meeting'],
+    labels: ['Gold Scale', 'SLED'],
     link: 'https://us-5814.app.gong.io/call?id=5860037599081297282&entry=calls_widget',
   },
   {
@@ -36,7 +36,7 @@ export const RECORDINGS: Recording[] = [
     title: 'FastPass Sync',
     owner: 'Noor Akhter',
     callDate: '2026-07-26',
-    phaseIds: ['meeting'],
+    labels: ['FastPass'],
     link: 'https://us-5814.app.gong.io/call?id=593102769271220887',
   },
   {
@@ -44,7 +44,7 @@ export const RECORDINGS: Recording[] = [
     title: 'AE Engagement',
     owner: 'Noor Akhter',
     callDate: '2026-05-15',
-    phaseIds: ['ae-outreach'],
+    labels: ['AE Engagement'],
     link: 'https://us-5814.app.gong.io/call?id=59408253280444890',
   },
   {
@@ -52,7 +52,7 @@ export const RECORDINGS: Recording[] = [
     title: 'Workflows and Fastpass Check in',
     owner: 'Sophia Stone',
     callDate: '2026-08-13',
-    phaseIds: ['meeting'],
+    labels: ['Workflows', 'FastPass'],
     link: 'https://us-5814.app.gong.io/call?id=4342904771528264211',
   },
   {
@@ -60,7 +60,7 @@ export const RECORDINGS: Recording[] = [
     title: 'OIE upgrade',
     owner: 'Lauren Cheung',
     callDate: '2026-07-16',
-    phaseIds: ['meeting'],
+    labels: ['OIE'],
     link: 'https://us-5814.app.gong.io/call?id=756107672496610184',
   },
   {
@@ -68,7 +68,7 @@ export const RECORDINGS: Recording[] = [
     title: 'Fastpass + Very technical, good question handling',
     owner: 'Dominic Bravo',
     callDate: '2026-06-30',
-    phaseIds: ['meeting'],
+    labels: ['FastPass', 'Technical Q&A'],
     link: 'https://us-5814.app.gong.io/call?id=4272575744472884645',
   },
   {
@@ -77,7 +77,7 @@ export const RECORDINGS: Recording[] = [
     customer: 'Chegg',
     owner: 'Carolyn Chorich',
     callDate: '2026-10-02',
-    phaseIds: ['sbr'],
+    labels: ['SBR'],
     link: 'https://us-5814.app.gong.io/welcome/sign-in?targeturl=%2Fcall%3Fid%3D7962750503935429428%26entry%3Dcalls_widget',
   },
   {
@@ -86,7 +86,7 @@ export const RECORDINGS: Recording[] = [
     customer: 'J.D. Power',
     owner: 'Ruthie Jehu',
     callDate: '2026-10-02',
-    phaseIds: ['sbr'],
+    labels: ['SBR'],
     link: 'https://us-5814.app.gong.io/call?id=5356077940782607868',
   },
   {
@@ -94,7 +94,7 @@ export const RECORDINGS: Recording[] = [
     title: 'Gong Enablement for CSMs',
     owner: 'Sophia Kaleem',
     callDate: '2026-03-31',
-    phaseIds: [],
+    labels: ['Gong Enablement'],
     link: 'https://us-5814.app.gong.io/call?id=7893345233917463612',
   },
   {
@@ -103,7 +103,7 @@ export const RECORDINGS: Recording[] = [
     customer: 'Chugach',
     owner: 'Julia Weiss',
     callDate: '2026-10-20',
-    phaseIds: ['sbr'],
+    labels: ['SBR'],
     link: 'https://us-5814.app.gong.io/call?id=4721771672532586449&entry=calls_widget',
   },
   {
@@ -112,7 +112,7 @@ export const RECORDINGS: Recording[] = [
     customer: 'Kinaxis',
     owner: 'Julia Weiss',
     callDate: '2026-10-15',
-    phaseIds: ['sbr'],
+    labels: ['SBR'],
     link: 'https://us-5814.app.gong.io/call?id=4721771672532586449&entry=calls_widget',
   },
 ]

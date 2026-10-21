@@ -21,7 +21,8 @@ A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
    dismissal.
 2. **A tool catalog** — searchable/filterable by lifecycle phase.
 3. **A Gong recordings library** — searchable/filterable by lifecycle phase,
-   kept fully separate from the passport mechanic.
+   kept fully separate from the passport mechanic. Populated with real call
+   recordings from the team's Gong catalog sheet.
 4. **My Tools** — favorited catalog tools and your own uploaded tools
    (stored locally, assignable to one or more phases), grouped by phase.
 5. **Workflows** — a "coming soon" stub for assigning favorited tools to
@@ -38,19 +39,22 @@ A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
   inventory) is validated. The catalog of record lives in a separate Google
   Sheet owned by that group.
 - **Several core lifecycle phases currently have no suggested tool**
-  (Customer research, AE outreach, Customer outreach, Meeting, Customer
-  organization, Resource gathering) now that placeholders are gone — a CSM
-  can't yet earn those stamps through a suggested tool. Worth populating
-  before this goes out for real use.
+  (Customer research, Customer outreach, Customer organization, Resource
+  gathering) now that placeholders are gone — a CSM can't yet earn those
+  stamps through a suggested tool. Worth populating before this goes out for
+  real use.
 - **Tools can be marked `comingSoon`** (see `src/data/tools.ts`) to show a
   "Coming soon" badge and disable the open/stamp actions — used today for
   the Gold Scale Strategic Coaching Agent.
 - **Users can upload their own tool** on the My Tools page — a name, an
   optional phase assignment, and a file. The file is stored only in the
   browser's `localStorage` as a data URL; nothing is uploaded anywhere.
-- **The Gong Library ships empty on purpose.** No real recordings exist yet;
-  the page is fully wired (search, phase filter chips, empty state) ready to
-  receive data once Amelia's Gong inventory is published.
+- **The Gong Library holds real call recordings** sourced from the team's
+  Gong catalog sheet (`src/data/recordings.ts`), searchable by title,
+  customer, or owner, and filterable by phase. Gong platform tools (AI
+  Assistant, AI Trainer, etc.) live in the Tool Catalog instead, and
+  Gong training/FAQ docs live in Home's "How-to guides for self-enablement"
+  section.
 - **Passport stamps are self-reported**, with no verification layer yet.
 - **Favoriting works; "assign to workflow" is a visible stub**, not
   functional.

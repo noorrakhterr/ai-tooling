@@ -9,7 +9,13 @@ export function RecordingCard({ recording }: RecordingCardProps) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-slate-900">{recording.title}</h3>
-      <p className="text-sm text-slate-600">{recording.customer}</p>
+      {(recording.customer || recording.owner) && (
+        <p className="text-sm text-slate-600">
+          {recording.customer && <span>{recording.customer}</span>}
+          {recording.customer && recording.owner && <span> · </span>}
+          {recording.owner && <span>{recording.owner}</span>}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <span>{recording.callDate}</span>
         {recording.phaseIds.map((phaseId) => {

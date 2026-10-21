@@ -13,7 +13,8 @@ export function GongLibraryPage() {
       const matchesQuery =
         query.trim() === '' ||
         recording.title.toLowerCase().includes(query.toLowerCase()) ||
-        recording.customer.toLowerCase().includes(query.toLowerCase())
+        (recording.customer?.toLowerCase().includes(query.toLowerCase()) ?? false) ||
+        (recording.owner?.toLowerCase().includes(query.toLowerCase()) ?? false)
       const matchesPhase = phaseFilter === 'all' || recording.phaseIds.includes(phaseFilter)
       return matchesQuery && matchesPhase
     })
@@ -24,8 +25,7 @@ export function GongLibraryPage() {
       <div>
         <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Searchable call recording library. No recordings published yet — check back once the Gong
-          inventory is complete.
+          Searchable call recording library, filterable by lifecycle phase.
         </p>
       </div>
 
@@ -34,7 +34,7 @@ export function GongLibraryPage() {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search recordings by title or customer…"
+          placeholder="Search recordings by title, customer, or owner…"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none sm:max-w-xs"
         />
         <div className="flex flex-wrap gap-2">
@@ -67,10 +67,7 @@ export function GongLibraryPage() {
       </div>
 
       {filteredRecordings.length === 0 ? (
-        <EmptyState
-          title="No recordings yet"
-          message="Check back once the Gong inventory is published. This library is fully wired for search and phase filtering — it just needs data."
-        />
+        <EmptyState title="No recordings match" message="Try a different search term or phase filter." />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRecordings.map((recording) => (

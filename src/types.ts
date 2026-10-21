@@ -25,7 +25,10 @@ export interface Tool {
 export interface Recording {
   id: string
   title: string
-  customer: string
+  /** Customer name, when identifiable from the call title. */
+  customer?: string
+  /** CSM/owner who ran or recorded the call. */
+  owner?: string
   callDate: string
   phaseIds: string[]
   link: string

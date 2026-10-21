@@ -2,7 +2,13 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// OAP build cache bust — force a fresh copy of this file into the builder.
+// Okta App Platform serves this app under a sub-path and injects
+// VITE_BASE_URL at build time (see its generated Dockerfile). Setting
+// `base` here ourselves means OAP's own vite.config.ts auto-patcher has
+// nothing left to inject — that patcher renames this file to
+// vite.config.original.ts and re-imports it, but the renamed file isn't
+// present when the Docker COPY step runs, which breaks the build.
 export default defineConfig({
+  base: process.env.VITE_BASE_URL || '/',
   plugins: [react(), tailwindcss()],
 })

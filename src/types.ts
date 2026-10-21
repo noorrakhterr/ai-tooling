@@ -37,3 +37,15 @@ export interface ReferenceResource {
   description: string
   link: string
 }
+
+export interface CustomTool {
+  id: string
+  name: string
+  phaseIds: string[]
+  fileName: string
+  fileType: string
+  fileSize: number
+  /** Data URL of the uploaded file, stored locally so it can be re-opened. */
+  fileDataUrl: string
+  addedAt: string
+}

@@ -1,49 +1,12 @@
 import type { Tool } from '../types'
 
 /**
- * Tool catalog. A mix of real, submitted tools and a handful of sample
- * placeholders still pending the validated inventory (Amelia: Gong
- * resources, Julia: AI resources) per the Gong and AI Tools Rollout Plan.
- * Phase assignments for newly-added tools without an obvious single-phase
- * fit (e.g. Path 2 Green) are best-guess and may need adjusting.
+ * Tool catalog. Real, submitted Gems/Agents only (plus the one announced
+ * but not-yet-available tool, flagged with comingSoon). Pending additions
+ * from the full "Gong and AI Tools Rollout Plan" inventory will be added
+ * here as they're validated.
  */
 export const TOOLS: Tool[] = [
-  {
-    id: 'account-research-gem',
-    name: 'Account Research Gem',
-    type: 'Gem',
-    description: 'Pulls account history, open tickets, and usage trends into a single research brief.',
-    phaseIds: ['customer-research'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
-    id: 'ae-handoff-notebook',
-    name: 'AE Handoff Notebook',
-    type: 'Notebook',
-    description: 'Summarizes AE context and deal history to align before CSM outreach.',
-    phaseIds: ['ae-outreach'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
-    id: 'customer-outreach-prompt',
-    name: 'Customer Outreach Prompt',
-    type: 'Prompt',
-    description: 'Drafts a personalized first-touch email referencing recent account activity.',
-    phaseIds: ['customer-outreach'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
-    id: 'meeting-grader-agent',
-    name: 'Meeting Grader / Coaching Agent',
-    type: 'Gem',
-    description: 'Identifies strengths and prepares better discovery questions ahead of a call.',
-    phaseIds: ['meeting-prep'],
-    link: '#',
-    owner: 'Julia',
-  },
   {
     id: 'gold-scale-coaching-agent',
     name: 'Gold Scale Strategic Coaching Agent',
@@ -52,15 +15,6 @@ export const TOOLS: Tool[] = [
     phaseIds: ['meeting-prep'],
     link: '#',
     comingSoon: true,
-  },
-  {
-    id: 'gong-call-review-guidance',
-    name: 'Gong Call Review Guidance',
-    type: 'Gong resource',
-    description: 'Reviews discovery, customer goals, risks, and next steps from the call recording.',
-    phaseIds: ['meeting', 'post-meeting'],
-    link: '#',
-    owner: 'Amelia',
   },
   {
     id: 'transcript-to-meeting-summary',
@@ -98,15 +52,6 @@ export const TOOLS: Tool[] = [
     link: 'https://gemini.google.com/gem/1ZCTmoW_hTA3uggWSl5Gsc_vVLRAR0jxT?usp=sharing',
   },
   {
-    id: 'followup-recap-skill',
-    name: 'Follow-up Recap Skill',
-    type: 'Skill',
-    description: 'Drafts a recap and customer commitments from meeting notes or a transcript.',
-    phaseIds: ['post-meeting', 'closing-out'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
     id: 'path-2-green-gem',
     name: 'Path 2 Green Gem',
     type: 'Gem',
@@ -125,15 +70,6 @@ export const TOOLS: Tool[] = [
     link: 'https://gemini.google.com/gem/1LfgD_tSxzFcCN_SXxd7gMPBkzctxsQku?usp=sharing',
   },
   {
-    id: 'closing-checklist-prompt',
-    name: 'Engagement Closeout Checklist',
-    type: 'Prompt',
-    description: 'Confirms open commitments and generates a closing summary for the customer.',
-    phaseIds: ['closing-out'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
     id: 'sbr-assist-agent',
     name: 'SBR Assist Gem',
     type: 'Agent',
@@ -150,23 +86,5 @@ export const TOOLS: Tool[] = [
       'Evaluates an SBR deck against a built-in rubric, producing a per-slide verdict, specific recommendations, and a review checklist before the customer presentation. Say "Hi" to start.',
     phaseIds: ['sbr'],
     link: 'https://vertexaisearch.cloud.google.com/home/cid/cd50f96b-072d-4a0a-9ac3-8699ac11797f/r/agent/9576353426048634315/session/-',
-  },
-  {
-    id: 'stakeholder-map-gem',
-    name: 'Stakeholder Mapping Gem',
-    type: 'Gem',
-    description: 'Builds an org chart and stakeholder map from available account data.',
-    phaseIds: ['customer-org'],
-    link: '#',
-    owner: 'Julia',
-  },
-  {
-    id: 'resource-finder-skill',
-    name: 'Resource Finder Skill',
-    type: 'Skill',
-    description: 'Surfaces relevant decks, docs, and playbooks for the engagement.',
-    phaseIds: ['resource-gathering'],
-    link: '#',
-    owner: 'Amelia',
   },
 ]

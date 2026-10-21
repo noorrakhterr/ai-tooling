@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { Sidebar } from './components/Sidebar'
+import { PassportPanel } from './components/PassportPanel'
 import { HomePage } from './pages/HomePage'
 import { CatalogPage } from './pages/CatalogPage'
 import { GongLibraryPage } from './pages/GongLibraryPage'
@@ -10,7 +11,7 @@ function App() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="min-w-0 flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-5xl">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -21,6 +22,7 @@ function App() {
           </Routes>
         </div>
       </main>
+      <PassportPanel />
     </div>
   )
 }

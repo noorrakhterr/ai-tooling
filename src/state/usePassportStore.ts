@@ -6,9 +6,7 @@ interface PassportState {
   stampedPhaseIds: string[]
   favoriteToolIds: string[]
   customTools: CustomTool[]
-  /** Whether the passport sidebar panel is collapsed to its minimized tab. */
-  passportMinimized: boolean
-  /** Whether the passport has been dismissed entirely (all phases stamped + user closed it). */
+  /** Whether the passport has been dismissed from Home (all core phases stamped + user closed it). */
   passportDismissed: boolean
   stampPhase: (phaseId: string) => void
   unstampPhase: (phaseId: string) => void
@@ -17,9 +15,7 @@ interface PassportState {
   isToolFavorited: (toolId: string) => boolean
   addCustomTool: (tool: CustomTool) => void
   removeCustomTool: (toolId: string) => void
-  setPassportMinimized: (minimized: boolean) => void
   dismissPassport: () => void
-  reopenPassport: () => void
 }
 
 export const usePassportStore = create<PassportState>()(
@@ -28,7 +24,6 @@ export const usePassportStore = create<PassportState>()(
       stampedPhaseIds: [],
       favoriteToolIds: [],
       customTools: [],
-      passportMinimized: false,
       passportDismissed: false,
       stampPhase: (phaseId) =>
         set((state) => ({
@@ -51,9 +46,7 @@ export const usePassportStore = create<PassportState>()(
       addCustomTool: (tool) => set((state) => ({ customTools: [...state.customTools, tool] })),
       removeCustomTool: (toolId) =>
         set((state) => ({ customTools: state.customTools.filter((tool) => tool.id !== toolId) })),
-      setPassportMinimized: (minimized) => set({ passportMinimized: minimized }),
       dismissPassport: () => set({ passportDismissed: true }),
-      reopenPassport: () => set({ passportDismissed: false, passportMinimized: false }),
     }),
     { name: 'ai-tooling-passport' },
   ),

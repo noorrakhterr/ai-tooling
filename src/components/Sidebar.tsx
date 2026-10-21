@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { usePassportStore } from '../state/usePassportStore'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home' },
+  { to: '/passport', label: 'Passport' },
   { to: '/catalog', label: 'Tool Catalog' },
   { to: '/gong-library', label: 'Gong Library' },
   { to: '/my-tools', label: 'My Tools' },
@@ -10,9 +10,6 @@ const NAV_ITEMS = [
 ]
 
 export function Sidebar() {
-  const passportDismissed = usePassportStore((state) => state.passportDismissed)
-  const reopenPassport = usePassportStore((state) => state.reopenPassport)
-
   return (
     <aside className="flex h-screen w-56 flex-shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-6">
       <div className="mb-8 flex items-center gap-2 px-2">
@@ -39,15 +36,6 @@ export function Sidebar() {
             {item.label}
           </NavLink>
         ))}
-        {passportDismissed && (
-          <button
-            type="button"
-            onClick={reopenPassport}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-          >
-            Passport
-          </button>
-        )}
       </nav>
     </aside>
   )

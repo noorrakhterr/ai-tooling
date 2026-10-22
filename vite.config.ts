@@ -9,11 +9,5 @@ import { defineConfig } from 'vite'
 // vite.config.original.ts and re-imports it, but the renamed file isn't
 // present when the Docker COPY step runs, which breaks the build.
 export default defineConfig({
-  // Force absolute paths regardless of what OAP injects for VITE_BASE_URL —
-  // confirmed it's set to an empty string on deploy, not unset, so `|| '/'`
-  // never kicks in and Vite defaults to relative paths. Relative asset URLs
-  // break on any deep client-side route (e.g. /auth/callback), since the
-  // browser resolves them against the current path, not the site root.
-  base: '/',
   plugins: [react(), tailwindcss()],
 })

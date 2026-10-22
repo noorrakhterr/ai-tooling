@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!--
+      OAP's build sets VITE_BASE_URL to "./" (relative), which breaks on
+      deep client-side routes like /auth/callback — the browser resolves
+      ./assets/... against the current path, not the site root, 404ing
+      the bundle. <base href="/"> fixes resolution for every relative URL
+      on the page regardless of Vite's own base config.
+    -->
+    <base href="/" />
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

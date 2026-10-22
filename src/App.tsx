@@ -7,8 +7,10 @@ import { CatalogPage } from './pages/CatalogPage'
 import { GongLibraryPage } from './pages/GongLibraryPage'
 import { MyToolsPage } from './pages/MyToolsPage'
 import { WorkflowsPage } from './pages/WorkflowsPage'
+import { AuthTestStartPage } from './pages/AuthTestStartPage'
+import { AuthTestCallbackPage } from './pages/AuthTestCallbackPage'
 
-const ROUTES_WITHOUT_BANNER = ['/', '/passport']
+const ROUTES_WITHOUT_BANNER = ['/', '/passport', '/auth/test-start', '/auth/callback']
 
 function App() {
   const location = useLocation()
@@ -27,6 +29,8 @@ function App() {
             <Route path="/gong-library" element={<GongLibraryPage />} />
             <Route path="/my-tools" element={<MyToolsPage />} />
             <Route path="/workflows" element={<WorkflowsPage />} />
+            <Route path="/auth/test-start" element={<AuthTestStartPage />} />
+            <Route path="/auth/callback" element={<AuthTestCallbackPage />} />
           </Routes>
         </div>
       </main>

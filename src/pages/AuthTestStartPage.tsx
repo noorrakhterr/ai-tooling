@@ -43,6 +43,7 @@ export function AuthTestStartPage() {
       code_challenge: challenge,
       code_challenge_method: 'S256',
       state: 'diagnostic',
+      prompt: 'login',
     })
     window.location.href = `${AUTHORIZE_URL}?${params.toString()}`
   }

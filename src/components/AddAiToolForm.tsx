@@ -53,17 +53,13 @@ export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
     }
 
     setSubmitting(true)
-    const { data, error: insertError } = await iddb
-      .from<Tool>('ai_tools')
-      .insert({
-        name: name.trim(),
-        type,
-        description: description.trim(),
-        link: link.trim(),
-        phaseIds: selectedPhaseIds,
-      })
-      .select()
-      .single()
+    const { data, error: insertError } = await iddb.table<Tool>('ai_tools').insertOne({
+      name: name.trim(),
+      type,
+      description: description.trim(),
+      link: link.trim(),
+      phaseIds: selectedPhaseIds,
+    })
     setSubmitting(false)
 
     if (insertError || !data) {

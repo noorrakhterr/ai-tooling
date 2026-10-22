@@ -47,19 +47,15 @@ export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
       .filter(Boolean)
 
     setSubmitting(true)
-    const { data, error: insertError } = await iddb
-      .from<Recording>('gong_recordings')
-      .insert({
-        title: title.trim(),
-        link: link.trim(),
-        customer: customer.trim() || undefined,
-        owner: owner.trim() || undefined,
-        callDate: new Date().toISOString().slice(0, 10),
-        labels,
-        transcript: transcript.trim() || undefined,
-      })
-      .select()
-      .single()
+    const { data, error: insertError } = await iddb.table<Recording>('gong_recordings').insertOne({
+      title: title.trim(),
+      link: link.trim(),
+      customer: customer.trim() || undefined,
+      owner: owner.trim() || undefined,
+      callDate: new Date().toISOString().slice(0, 10),
+      labels,
+      transcript: transcript.trim() || undefined,
+    })
     setSubmitting(false)
 
     if (insertError || !data) {

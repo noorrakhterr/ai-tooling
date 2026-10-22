@@ -70,28 +70,43 @@ A v1 prototype dashboard for Okta Gold/Silver Scale CSMs, combining:
 - **State is mixed.** Stamps, favorites, custom tool uploads, and the
   passport's dismissed state are still per-browser, in `localStorage` — that
   part is intentionally personal. Catalog tools and Gong recordings are now
-  **shared**, backed by Okta App Platform's Postgres database via
-  `@iddb/client` (see `src/lib/iddb.ts`, `src/hooks/useTools.ts`,
+  **shared**, backed by Okta App Platform's auto-generated Postgres REST API
+  (see `src/lib/iddb.ts`, `src/hooks/useTools.ts`,
   `src/hooks/useRecordings.ts`). Adding a tool or call writes to that shared
   database; everyone who loads the app sees it.
-- **No login screen.** The app sits behind OAP's own Okta-backed access
-  gate (`first_party_oidc`), so by the time anyone reaches this app they're
-  already signed in, and `@iddb/client` picks up that session automatically
-  — no sign-in code was needed here.
+- **No login screen, and no `@iddb/client` package.** The app sits behind
+  OAP's own Okta-backed access gate, so by the time anyone reaches this app
+  they're already signed in. For the database itself, `src/lib/iddb.ts`
+  calls OAP's REST API directly with `fetch()` and the browser-safe anon
+  key, rather than using the `@iddb/client` SDK — that package lives on a
+  private npm registry this tenant never had configured, and after a lot of
+  back-and-forth trying to get that registry set up, calling the REST API
+  directly turned out to need zero extra setup and zero new dependencies.
+  See git history around Oct 2026 for the full saga if curious.
 
 ## Backend setup (one-time, already done for the deployed app)
 
 This app's shared data lives in two Postgres tables, `ai_tools` and
-`gong_recordings`, created and seeded via the SQL files in `db/`:
+`gong_recordings`, created and seeded via the SQL files in `db/`, run in
+order against the OAP dashboard's SQL editor for the `ai-tools` tenant:
 
-1. `db/001_create_ai_tools_and_gong_recordings.sql` — run once via the OAP
-   dashboard's SQL editor for the `ai-tools` tenant. Creates both tables
-   with RLS enabled and a permissive "any signed-in teammate can read and
-   write" policy (not per-user-owner scoped — this is shared team data).
-2. `db/002_seed_data.sql` — generated from the original hardcoded
+1. `001_create_ai_tools_and_gong_recordings.sql` — creates both tables,
+   enables RLS (locks out all access until policies exist).
+2. `002_add_rls_policies.sql` — policies for the app's own dedicated
+   Postgres role (shown on the dashboard's "Manage grants" page after
+   applying a resource grant there for both tables).
+3. `003_seed_data.sql` — generated from the original hardcoded
    `src/data/tools.ts` / `src/data/recordings.ts` arrays via
-   `npx tsx db/generate-seed-sql.ts`; run once, after (1), to carry the
-   existing catalog into the new tables. Re-running it duplicates rows.
+   `npx tsx db/generate-seed-sql.ts`; carries the existing catalog into the
+   new tables. Re-running it duplicates rows.
+4. `004_grant_tenant_roles.sql` — the step that actually made browser
+   reads/writes work. The app's resource grant (step 2) only covers the
+   app's own server-side Postgres role; a direct REST call from the browser
+   using the anon key authenticates as the tenant-wide `ai-tools_anon` /
+   `ai-tools_authenticated` role instead, which needs its own grant +
+   policies. Confirmed by testing the REST API directly with `curl` and
+   reading the resulting `IDDB_GRANT_MISSING` error, which named the exact
+   fix.
 
 Those static arrays remain in the repo as a fallback: if the database fetch
 fails for any reason, the Catalog/Gong Library pages fall back to showing
@@ -108,27 +123,23 @@ npm run dev
 npm run build   # type-checks and produces a static build in dist/
 ```
 
-### Local dev and `@iddb/client`
+### Local dev and the database
 
-`@iddb/client` lives on OAP's private npm registry, not the public one —
-plain `npm install @iddb/client` won't resolve it without that registry's
-credentials configured locally (not yet set up for this tenant as of this
-writing). Until that's sorted out:
+Add a `.env.local` (gitignored) with:
+```
+VITE_IDDB_ANON_KEY=<the ai-tools tenant's anon key>
+```
+This is the browser-safe key — fine to share among teammates working on
+this repo, but don't commit it.
 
-- `npm install`/`npm run dev`/`npm run build` all work anyway — `vite.config.ts`
-  automatically falls back to a local stub (`src/lib/iddb-client-stub.ts`)
-  whenever the real package isn't in `node_modules`. The stub returns empty
-  results instead of talking to a real database, and the Catalog/Gong
-  Library pages fall back to the seeded static data in that case — so local
-  dev still looks and works like the app, it just can't actually read/write
-  the shared tables.
-- To test real shared reads/writes locally, you need the real `@iddb/client`
-  installed. Once the tenant's npm registry is configured (`iddb npm set`,
-  tenant-admin action), run `npm install @iddb/client` again — the stub
-  automatically stops being used once the real package is present.
-- Either way, add a `.env.local` (gitignored) with:
-  ```
-  VITE_IDDB_ANON_KEY=<the ai-tools tenant's anon key>
-  ```
-  This is the browser-safe key — fine to share among teammates working on
-  this repo, but don't commit it.
+**One real limitation:** OAP's REST API only sends CORS headers back for
+the actual deployed app's origin (`https://repository.ai-tools.platform.atko.ai`),
+not `http://localhost:*`. That means `npm run dev` locally will hit a CORS
+error on every database read/write — confirmed directly (`curl -i -X
+OPTIONS ... -H "Origin: http://localhost:5173"` returns no
+`Access-Control-Allow-Origin` header, while the same request with the real
+deployed origin does). Local dev still works for everything else (the
+Catalog/Gong Library pages fall back to the seeded static data when the
+fetch fails), but testing a real database write needs the deployed app —
+there's no known way to test this specific part against the real database
+from `localhost`.

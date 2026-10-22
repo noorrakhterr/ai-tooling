@@ -6,15 +6,14 @@ import type { Recording } from '../types'
 /**
  * Gong recordings shared across the whole team, backed by the
  * `gong_recordings` table. Falls back to the seeded RECORDINGS array if
- * the fetch fails (e.g. local dev without @iddb/client installed, or the
- * table not existing yet).
+ * the fetch fails.
  */
 export function useRecordings() {
   const [recordings, setRecordings] = useState<Recording[]>(SEED_RECORDINGS)
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    const { data, error } = await iddb.from<Recording>('gong_recordings').select('*')
+    const { data, error } = await iddb.table<Recording>('gong_recordings').selectAll()
     setRecordings(error || !data ? SEED_RECORDINGS : data)
     setLoading(false)
   }, [])

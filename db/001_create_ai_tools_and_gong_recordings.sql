@@ -1,8 +1,11 @@
 -- Run via the OAP dashboard SQL editor for tenant "ai-tools".
 -- Column names are quoted camelCase to match the TypeScript Tool/Recording
 -- shapes (src/types.ts) exactly — no snake_case<->camelCase mapping layer.
--- Adjust the role name below if it doesn't match what the dashboard shows
--- for this tenant's authenticated role.
+--
+-- This step only creates the tables and enables RLS (locking out all
+-- access until policies exist). RLS policies are added in a follow-up
+-- step once the resource grant is applied and the real authenticated
+-- role name is confirmed from the dashboard — see db/002_add_rls_policies.sql.
 
 CREATE TABLE ai_tools (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -18,24 +21,6 @@ CREATE TABLE ai_tools (
 
 ALTER TABLE ai_tools ENABLE ROW LEVEL SECURITY;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON ai_tools TO "ai-tools_authenticated";
-
-CREATE POLICY "authenticated read ai_tools"
-  ON ai_tools FOR SELECT
-  TO "ai-tools_authenticated"
-  USING (true);
-
-CREATE POLICY "authenticated write ai_tools"
-  ON ai_tools FOR INSERT
-  TO "ai-tools_authenticated"
-  WITH CHECK (true);
-
-CREATE POLICY "authenticated update ai_tools"
-  ON ai_tools FOR UPDATE
-  TO "ai-tools_authenticated"
-  USING (true)
-  WITH CHECK (true);
-
 CREATE TABLE gong_recordings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
@@ -49,21 +34,3 @@ CREATE TABLE gong_recordings (
 );
 
 ALTER TABLE gong_recordings ENABLE ROW LEVEL SECURITY;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON gong_recordings TO "ai-tools_authenticated";
-
-CREATE POLICY "authenticated read gong_recordings"
-  ON gong_recordings FOR SELECT
-  TO "ai-tools_authenticated"
-  USING (true);
-
-CREATE POLICY "authenticated write gong_recordings"
-  ON gong_recordings FOR INSERT
-  TO "ai-tools_authenticated"
-  WITH CHECK (true);
-
-CREATE POLICY "authenticated update gong_recordings"
-  ON gong_recordings FOR UPDATE
-  TO "ai-tools_authenticated"
-  USING (true)
-  WITH CHECK (true);

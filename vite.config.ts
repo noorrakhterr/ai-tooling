@@ -9,5 +9,6 @@ import { defineConfig } from 'vite'
 // vite.config.original.ts and re-imports it, but the renamed file isn't
 // present when the Docker COPY step runs, which breaks the build.
 export default defineConfig({
+  base: process.env.VITE_BASE_URL || '/',
   plugins: [react(), tailwindcss()],
 })

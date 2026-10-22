@@ -1,6 +1,6 @@
-import { TOOLS } from '../data/tools'
 import type { Phase } from '../types'
 import { usePassportStore } from '../state/usePassportStore'
+import { useTools } from '../hooks/useTools'
 import { ToolCard } from './ToolCard'
 
 interface PhasePanelProps {
@@ -11,7 +11,8 @@ interface PhasePanelProps {
 
 export function PhasePanel({ phase, embedded = false }: PhasePanelProps) {
   const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
-  const suggestedTools = TOOLS.filter((tool) => tool.phaseIds.includes(phase.id))
+  const { tools } = useTools()
+  const suggestedTools = tools.filter((tool) => tool.phaseIds.includes(phase.id))
   const stamped = isPhaseStamped(phase.id)
 
   return (

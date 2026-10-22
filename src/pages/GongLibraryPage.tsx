@@ -1,20 +1,22 @@
 import { useMemo, useState } from 'react'
-import { RECORDINGS } from '../data/recordings'
+import { useRecordings } from '../hooks/useRecordings'
 import { RecordingCard } from '../components/RecordingCard'
+import { AddGongCallForm } from '../components/AddGongCallForm'
 import { EmptyState } from '../components/EmptyState'
 
 export function GongLibraryPage() {
+  const { recordings, addRecording } = useRecordings()
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState<string | 'all'>('all')
 
   const allLabels = useMemo(() => {
     const labels = new Set<string>()
-    RECORDINGS.forEach((recording) => recording.labels.forEach((label) => labels.add(label)))
+    recordings.forEach((recording) => recording.labels.forEach((label) => labels.add(label)))
     return [...labels].sort()
-  }, [])
+  }, [recordings])
 
   const filteredRecordings = useMemo(() => {
-    return RECORDINGS.filter((recording) => {
+    return recordings.filter((recording) => {
       const matchesQuery =
         query.trim() === '' ||
         recording.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -23,15 +25,18 @@ export function GongLibraryPage() {
       const matchesLabel = labelFilter === 'all' || recording.labels.includes(labelFilter)
       return matchesQuery && matchesLabel
     })
-  }, [query, labelFilter])
+  }, [recordings, query, labelFilter])
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Searchable call recording library, filterable by label.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Searchable call recording library, filterable by label.
+          </p>
+        </div>
+        <AddGongCallForm onAdded={addRecording} />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

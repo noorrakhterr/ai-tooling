@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react'
 import { ALL_PHASES } from '../data/phases'
-import { TOOLS } from '../data/tools'
+import { useTools } from '../hooks/useTools'
 import { ToolCard } from '../components/ToolCard'
+import { AddAiToolForm } from '../components/AddAiToolForm'
 import { EmptyState } from '../components/EmptyState'
 
 export function CatalogPage() {
+  const { tools, addTool } = useTools()
   const [query, setQuery] = useState('')
   const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
 
   const filteredTools = useMemo(() => {
-    return TOOLS.filter((tool) => {
+    return tools.filter((tool) => {
       const matchesQuery =
         query.trim() === '' ||
         tool.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -17,16 +19,19 @@ export function CatalogPage() {
       const matchesPhase = phaseFilter === 'all' || tool.phaseIds.includes(phaseFilter)
       return matchesQuery && matchesPhase
     })
-  }, [query, phaseFilter])
+  }, [tools, query, phaseFilter])
 
   return (
     <div className="flex flex-col gap-5">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Some entries are validated and ready to use; others are placeholders pending the full AI
-          &amp; Gong resource inventory.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Some entries are validated and ready to use; others are placeholders pending the full AI
+            &amp; Gong resource inventory.
+          </p>
+        </div>
+        <AddAiToolForm onAdded={addTool} />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

@@ -33,6 +33,8 @@ export interface Recording {
   /** Free-text labels/use-case tags, as assigned in the Gong catalog sheet — not lifecycle phases. */
   labels: string[]
   link: string
+  /** Optional pasted call transcript — not used for search yet, captured for a future feature. */
+  transcript?: string
 }
 
 export interface ReferenceResource {

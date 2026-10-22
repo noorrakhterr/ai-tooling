@@ -1,5 +1,5 @@
 import { ALL_PHASES } from '../data/phases'
-import { TOOLS } from '../data/tools'
+import { useTools } from '../hooks/useTools'
 import { usePassportStore } from '../state/usePassportStore'
 import { ToolCard } from '../components/ToolCard'
 import { CustomToolCard } from '../components/CustomToolCard'
@@ -7,9 +7,10 @@ import { CustomToolUploadForm } from '../components/CustomToolUploadForm'
 import { EmptyState } from '../components/EmptyState'
 
 export function MyToolsPage() {
+  const { tools } = useTools()
   const favoriteToolIds = usePassportStore((state) => state.favoriteToolIds)
   const customTools = usePassportStore((state) => state.customTools)
-  const favoriteTools = TOOLS.filter((tool) => favoriteToolIds.includes(tool.id))
+  const favoriteTools = tools.filter((tool) => favoriteToolIds.includes(tool.id))
 
   const unassignedCustomTools = customTools.filter((tool) => tool.phaseIds.length === 0)
   const hasAnyTools = favoriteTools.length > 0 || customTools.length > 0

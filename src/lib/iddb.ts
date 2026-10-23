@@ -17,7 +17,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<IddbRes
     const response = await fetch(`/api${path}`, {
       ...init,
       headers: {
-        'Content-Type': 'application/json',
+        // Only set Content-Type when there's a body — an empty-bodied
+        // request (DELETE) with this header set gets rejected downstream.
+        // See server.js's restRequest for the same fix on the next hop.
+        ...(init.body ? { 'Content-Type': 'application/json' } : {}),
         ...init.headers,
       },
     })

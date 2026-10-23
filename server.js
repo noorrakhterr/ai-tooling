@@ -28,10 +28,6 @@ const RESOURCE_KEY = process.env.IDDB_RESOURCE_KEY
 const REST_BASE = `${process.env.IDDB_API_URL}/rest/v1`
 
 const app = express()
-app.use((req, _res, next) => {
-  console.log(`incoming: ${req.method} ${req.path}`)
-  next()
-})
 app.use(express.json())
 
 async function restRequest(path, init = {}) {
@@ -40,7 +36,11 @@ async function restRequest(path, init = {}) {
     headers: {
       apikey: RESOURCE_KEY,
       Authorization: `Bearer ${RESOURCE_KEY}`,
-      'Content-Type': 'application/json',
+      // Only set Content-Type when there's actually a body — the internal
+      // gateway is Fastify-based and rejects application/json with an
+      // empty body (FST_ERR_CTP_EMPTY_JSON_BODY), which DELETE always has.
+      // Confirmed via a real deployed request, not assumption.
+      ...(init.body ? { 'Content-Type': 'application/json' } : {}),
       Prefer: 'return=representation',
       ...init.headers,
     },

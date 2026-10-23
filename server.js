@@ -16,6 +16,12 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 8080
 const ANON_KEY = process.env.IDDB_ANON_KEY
+const RESOURCE_KEY = process.env.IDDB_RESOURCE_KEY
+// The public anon key got "invalid API key for this tenant" from the
+// internal gateway — confirmed via a real deployed test, not assumption.
+// The resource key is the one meant for pod-to-pod/internal calls; try it
+// here, since it's the only other credential this app has.
+const AUTH_KEY = RESOURCE_KEY || ANON_KEY
 
 // The public api.platform.atko.ai host (used by the old browser-side client)
 // isn't reachable from inside this container — confirmed via runtime logs
@@ -35,8 +41,8 @@ async function restRequest(path, init = {}) {
   const response = await fetch(`${REST_BASE}${path}`, {
     ...init,
     headers: {
-      apikey: ANON_KEY,
-      Authorization: `Bearer ${ANON_KEY}`,
+      apikey: AUTH_KEY,
+      Authorization: `Bearer ${AUTH_KEY}`,
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
       ...init.headers,
@@ -44,6 +50,9 @@ async function restRequest(path, init = {}) {
   })
   const text = await response.text()
   const json = text ? JSON.parse(text) : null
+  if (!response.ok) {
+    console.log(`restRequest ${REST_BASE}${path} -> ${response.status}: ${text}`)
+  }
   return { ok: response.ok, status: response.status, json }
 }
 
@@ -78,5 +87,7 @@ app.get('/*splat', (_req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`server listening on :${PORT}, anon key present: ${Boolean(ANON_KEY)}`)
+  console.log(
+    `server listening on :${PORT}, anon key present: ${Boolean(ANON_KEY)}, resource key present: ${Boolean(RESOURCE_KEY)}, using ${RESOURCE_KEY ? 'resource' : 'anon'} key for REST calls`,
+  )
 })

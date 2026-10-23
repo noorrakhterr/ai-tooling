@@ -1,13 +1,22 @@
 /**
  * Node server for OAP — replaces the static-SPA runtime.
  *
- * Why this exists: the browser can never hold IDDB_ANON_KEY, because OAP
- * only injects it into a running container's process.env at runtime, not
- * into the Vite build (confirmed empirically — see git history around Oct
- * 2026). A real server process, unlike a static build, genuinely has that
- * env var available when it handles a request. So this server holds the
- * key and does the REST calls itself; the browser calls these same-origin
- * routes with no credential at all.
+ * Why this exists: the browser can never hold a database credential — OAP
+ * only injects secrets into a running container's process.env at runtime,
+ * never into the Vite build (confirmed empirically — see git history
+ * around Oct 2026 for the full saga). A real server process genuinely has
+ * these env vars available when it handles a request, so this server
+ * holds the credential and does the REST calls itself; the browser calls
+ * these same-origin routes with no credential of any kind.
+ *
+ * Two things confirmed only by deploying and checking real runtime logs,
+ * not assumption:
+ * - The public api.platform.atko.ai host isn't reachable from inside this
+ *   container (ConnectTimeoutError on every call) — use IDDB_API_URL, the
+ *   cluster-internal gateway, instead.
+ * - That internal gateway rejects IDDB_ANON_KEY ("invalid API key for
+ *   this tenant") — it wants IDDB_RESOURCE_KEY, the credential meant for
+ *   pod-to-pod calls, not the public-facing anon key.
  */
 import express from 'express'
 import path from 'path'
@@ -15,24 +24,8 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 8080
-const ANON_KEY = process.env.IDDB_ANON_KEY
 const RESOURCE_KEY = process.env.IDDB_RESOURCE_KEY
-// The public anon key got "invalid API key for this tenant" from the
-// internal gateway — confirmed via a real deployed test, not assumption.
-// The resource key is the one meant for pod-to-pod/internal calls; try it
-// here, since it's the only other credential this app has.
-const AUTH_KEY = RESOURCE_KEY || ANON_KEY
-
-// The public api.platform.atko.ai host (used by the old browser-side client)
-// isn't reachable from inside this container — confirmed via runtime logs
-// (ConnectTimeoutError on every outbound call). IDDB_API_URL is the
-// cluster-internal gateway this app's own pod is meant to call instead; it
-// already has the tenant baked into its path (".../ai-tools"), so this just
-// appends the same /rest/v1/<table> shape the public PostgREST endpoint uses.
-const INTERNAL_API_BASE = process.env.IDDB_API_URL
-const REST_BASE = INTERNAL_API_BASE
-  ? `${INTERNAL_API_BASE}/rest/v1`
-  : 'https://api.platform.atko.ai/ai-tools/rest/v1'
+const REST_BASE = `${process.env.IDDB_API_URL}/rest/v1`
 
 const app = express()
 app.use(express.json())
@@ -41,8 +34,8 @@ async function restRequest(path, init = {}) {
   const response = await fetch(`${REST_BASE}${path}`, {
     ...init,
     headers: {
-      apikey: AUTH_KEY,
-      Authorization: `Bearer ${AUTH_KEY}`,
+      apikey: RESOURCE_KEY,
+      Authorization: `Bearer ${RESOURCE_KEY}`,
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
       ...init.headers,
@@ -87,7 +80,5 @@ app.get('/*splat', (_req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(
-    `server listening on :${PORT}, anon key present: ${Boolean(ANON_KEY)}, resource key present: ${Boolean(RESOURCE_KEY)}, using ${RESOURCE_KEY ? 'resource' : 'anon'} key for REST calls`,
-  )
+  console.log(`server listening on :${PORT}, resource key present: ${Boolean(RESOURCE_KEY)}`)
 })

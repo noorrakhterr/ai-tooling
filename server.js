@@ -15,9 +15,18 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 8080
-const TENANT = process.env.IDDB_TENANT || 'ai-tools'
-const REST_BASE = `https://api.platform.atko.ai/${TENANT}/rest/v1`
 const ANON_KEY = process.env.IDDB_ANON_KEY
+
+// The public api.platform.atko.ai host (used by the old browser-side client)
+// isn't reachable from inside this container — confirmed via runtime logs
+// (ConnectTimeoutError on every outbound call). IDDB_API_URL is the
+// cluster-internal gateway this app's own pod is meant to call instead; it
+// already has the tenant baked into its path (".../ai-tools"), so this just
+// appends the same /rest/v1/<table> shape the public PostgREST endpoint uses.
+const INTERNAL_API_BASE = process.env.IDDB_API_URL
+const REST_BASE = INTERNAL_API_BASE
+  ? `${INTERNAL_API_BASE}/rest/v1`
+  : 'https://api.platform.atko.ai/ai-tools/rest/v1'
 
 const app = express()
 app.use(express.json())

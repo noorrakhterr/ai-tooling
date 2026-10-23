@@ -23,13 +23,20 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<IddbRes
     })
 
     const text = await response.text()
-    const json = text ? JSON.parse(text) : null
-
-    if (!response.ok) {
-      return { data: null, error: { message: json?.error?.message ?? `Request failed (${response.status})` } }
+    let json: unknown = null
+    try {
+      json = text ? JSON.parse(text) : null
+    } catch {
+      // non-JSON response body — keep `text` for the error message below
     }
 
-    return { data: json, error: null }
+    if (!response.ok) {
+      const parsed = json as { error?: { message?: string } } | null
+      const message = parsed?.error?.message ?? `Request failed (${response.status}): ${text.slice(0, 300)}`
+      return { data: null, error: { message } }
+    }
+
+    return { data: json as T, error: null }
   } catch (err) {
     return { data: null, error: { message: err instanceof Error ? err.message : 'Network error' } }
   }

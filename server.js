@@ -28,6 +28,10 @@ const RESOURCE_KEY = process.env.IDDB_RESOURCE_KEY
 const REST_BASE = `${process.env.IDDB_API_URL}/rest/v1`
 
 const app = express()
+app.use((req, _res, next) => {
+  console.log(`incoming: ${req.method} ${req.path}`)
+  next()
+})
 app.use(express.json())
 
 async function restRequest(path, init = {}) {

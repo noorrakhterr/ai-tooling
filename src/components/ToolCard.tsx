@@ -1,10 +1,15 @@
+import { useState } from 'react'
 import type { Tool } from '../types'
 import { usePassportStore } from '../state/usePassportStore'
+import { iddb } from '../lib/iddb'
 
 interface ToolCardProps {
   tool: Tool
   /** When set, shows a "Mark used" button that stamps this phase. */
   phaseIdToStamp?: string
+  /** When set, shows Edit/Delete controls for this tool (the shared catalog, not local-only entries). */
+  onEdit?: (tool: Tool) => void
+  onDeleted?: (id: string) => void
 }
 
 const TYPE_STYLES: Record<Tool['type'], string> = {
@@ -17,14 +22,27 @@ const TYPE_STYLES: Record<Tool['type'], string> = {
   Other: 'bg-slate-100 text-slate-700',
 }
 
-export function ToolCard({ tool, phaseIdToStamp }: ToolCardProps) {
+export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted }: ToolCardProps) {
   const isToolFavorited = usePassportStore((state) => state.isToolFavorited)
   const toggleFavorite = usePassportStore((state) => state.toggleFavorite)
   const stampPhase = usePassportStore((state) => state.stampPhase)
   const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
+  const [deleting, setDeleting] = useState(false)
 
   const favorited = isToolFavorited(tool.id)
   const phaseStamped = phaseIdToStamp ? isPhaseStamped(phaseIdToStamp) : false
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Delete "${tool.name}" for everyone? This can't be undone.`)) return
+    setDeleting(true)
+    const { error } = await iddb.table<Tool>('ai_tools').deleteOne(tool.id)
+    setDeleting(false)
+    if (error) {
+      window.alert(error.message)
+      return
+    }
+    onDeleted?.(tool.id)
+  }
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -83,6 +101,29 @@ export function ToolCard({ tool, phaseIdToStamp }: ToolCardProps) {
           >
             {phaseStamped ? 'Stamped ✓' : "I used this"}
           </button>
+        )}
+        {(onEdit || onDeleted) && (
+          <div className="flex items-center gap-3">
+            {onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(tool)}
+                className="text-xs font-medium text-slate-500 hover:text-slate-700"
+              >
+                Edit
+              </button>
+            )}
+            {onDeleted && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-60"
+              >
+                {deleting ? 'Deleting…' : 'Delete'}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

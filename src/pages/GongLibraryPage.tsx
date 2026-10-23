@@ -3,11 +3,13 @@ import { useRecordings } from '../hooks/useRecordings'
 import { RecordingCard } from '../components/RecordingCard'
 import { AddGongCallForm } from '../components/AddGongCallForm'
 import { EmptyState } from '../components/EmptyState'
+import type { Recording } from '../types'
 
 export function GongLibraryPage() {
-  const { recordings, addRecording } = useRecordings()
+  const { recordings, addRecording, updateRecording, removeRecording } = useRecordings()
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState<string | 'all'>('all')
+  const [editingRecording, setEditingRecording] = useState<Recording | null>(null)
 
   const allLabels = useMemo(() => {
     const labels = new Set<string>()
@@ -36,8 +38,20 @@ export function GongLibraryPage() {
             Searchable call recording library, filterable by label.
           </p>
         </div>
-        <AddGongCallForm onAdded={addRecording} />
+        {!editingRecording && <AddGongCallForm onAdded={addRecording} />}
       </div>
+
+      {editingRecording && (
+        <AddGongCallForm
+          onAdded={addRecording}
+          editingRecording={editingRecording}
+          onUpdated={(recording) => {
+            updateRecording(recording)
+            setEditingRecording(null)
+          }}
+          onCancelEdit={() => setEditingRecording(null)}
+        />
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
@@ -81,7 +95,12 @@ export function GongLibraryPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRecordings.map((recording) => (
-            <RecordingCard key={recording.id} recording={recording} />
+            <RecordingCard
+              key={recording.id}
+              recording={recording}
+              onEdit={setEditingRecording}
+              onDeleted={removeRecording}
+            />
           ))}
         </div>
       )}

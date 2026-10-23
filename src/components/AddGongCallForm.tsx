@@ -5,16 +5,22 @@ import { iddb } from '../lib/iddb'
 
 interface AddGongCallFormProps {
   onAdded: (recording: Recording) => void
+  /** When set, the form opens pre-filled and submits as an update instead of an insert. */
+  editingRecording?: Recording
+  onUpdated?: (recording: Recording) => void
+  /** Called when an edit is cancelled, so the parent can close the edit view. */
+  onCancelEdit?: () => void
 }
 
-export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
-  const [open, setOpen] = useState(false)
-  const [title, setTitle] = useState('')
-  const [link, setLink] = useState('')
-  const [customer, setCustomer] = useState('')
-  const [owner, setOwner] = useState('')
-  const [labelsInput, setLabelsInput] = useState('')
-  const [transcript, setTranscript] = useState('')
+export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancelEdit }: AddGongCallFormProps) {
+  const isEditing = Boolean(editingRecording)
+  const [open, setOpen] = useState(isEditing)
+  const [title, setTitle] = useState(editingRecording?.title ?? '')
+  const [link, setLink] = useState(editingRecording?.link ?? '')
+  const [customer, setCustomer] = useState(editingRecording?.customer ?? '')
+  const [owner, setOwner] = useState(editingRecording?.owner ?? '')
+  const [labelsInput, setLabelsInput] = useState(editingRecording?.labels.join(', ') ?? '')
+  const [transcript, setTranscript] = useState(editingRecording?.transcript ?? '')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -26,6 +32,15 @@ export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
     setLabelsInput('')
     setTranscript('')
     setError(null)
+  }
+
+  const handleCancel = () => {
+    if (isEditing) {
+      onCancelEdit?.()
+      return
+    }
+    resetForm()
+    setOpen(false)
   }
 
   const handleSubmit = async (event: FormEvent) => {
@@ -46,15 +61,32 @@ export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
       .map((label) => label.trim())
       .filter(Boolean)
 
-    setSubmitting(true)
-    const { data, error: insertError } = await iddb.table<Recording>('gong_recordings').insertOne({
+    const values = {
       title: title.trim(),
       link: link.trim(),
       customer: customer.trim() || undefined,
       owner: owner.trim() || undefined,
-      callDate: new Date().toISOString().slice(0, 10),
       labels,
       transcript: transcript.trim() || undefined,
+    }
+
+    setSubmitting(true)
+    if (isEditing && editingRecording) {
+      const { data, error: updateError } = await iddb
+        .table<Recording>('gong_recordings')
+        .updateOne(editingRecording.id, values)
+      setSubmitting(false)
+      if (updateError || !data) {
+        setError(updateError?.message ?? 'Something went wrong updating the call.')
+        return
+      }
+      onUpdated?.(data)
+      return
+    }
+
+    const { data, error: insertError } = await iddb.table<Recording>('gong_recordings').insertOne({
+      ...values,
+      callDate: editingRecording?.callDate ?? new Date().toISOString().slice(0, 10),
     })
     setSubmitting(false)
 
@@ -83,19 +115,16 @@ export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">Add Gong Call</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{isEditing ? 'Edit Gong Call' : 'Add Gong Call'}</h3>
         <button
           type="button"
-          onClick={() => {
-            resetForm()
-            setOpen(false)
-          }}
+          onClick={handleCancel}
           className="text-xs font-medium text-slate-500 hover:text-slate-700"
         >
           Cancel
         </button>
       </div>
-      <p className="text-xs text-slate-400">Visible to everyone on the team once added.</p>
+      <p className="text-xs text-slate-400">Visible to everyone on the team once {isEditing ? 'saved' : 'added'}.</p>
 
       <div>
         <label htmlFor="add-call-title" className="text-xs font-semibold text-slate-700">
@@ -190,7 +219,7 @@ export function AddGongCallForm({ onAdded }: AddGongCallFormProps) {
         disabled={submitting}
         className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
       >
-        {submitting ? 'Adding…' : 'Add call for everyone'}
+        {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Add call for everyone'}
       </button>
     </form>
   )

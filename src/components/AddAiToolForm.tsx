@@ -8,15 +8,21 @@ const TOOL_TYPES: ToolType[] = ['Gem', 'Agent', 'Skill', 'Prompt', 'Notebook', '
 
 interface AddAiToolFormProps {
   onAdded: (tool: Tool) => void
+  /** When set, the form opens pre-filled and submits as an update instead of an insert. */
+  editingTool?: Tool
+  onUpdated?: (tool: Tool) => void
+  /** Called when an edit is cancelled, so the parent can close the edit view. */
+  onCancelEdit?: () => void
 }
 
-export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [type, setType] = useState<ToolType>('Gem')
-  const [description, setDescription] = useState('')
-  const [link, setLink] = useState('')
-  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>([])
+export function AddAiToolForm({ onAdded, editingTool, onUpdated, onCancelEdit }: AddAiToolFormProps) {
+  const isEditing = Boolean(editingTool)
+  const [open, setOpen] = useState(isEditing)
+  const [name, setName] = useState(editingTool?.name ?? '')
+  const [type, setType] = useState<ToolType>(editingTool?.type ?? 'Gem')
+  const [description, setDescription] = useState(editingTool?.description ?? '')
+  const [link, setLink] = useState(editingTool?.link ?? '')
+  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>(editingTool?.phaseIds ?? [])
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -33,6 +39,15 @@ export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
     setLink('')
     setSelectedPhaseIds([])
     setError(null)
+  }
+
+  const handleCancel = () => {
+    if (isEditing) {
+      onCancelEdit?.()
+      return
+    }
+    resetForm()
+    setOpen(false)
   }
 
   const handleSubmit = async (event: FormEvent) => {
@@ -52,14 +67,27 @@ export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
       return
     }
 
-    setSubmitting(true)
-    const { data, error: insertError } = await iddb.table<Tool>('ai_tools').insertOne({
+    const values = {
       name: name.trim(),
       type,
       description: description.trim(),
       link: link.trim(),
       phaseIds: selectedPhaseIds,
-    })
+    }
+
+    setSubmitting(true)
+    if (isEditing && editingTool) {
+      const { data, error: updateError } = await iddb.table<Tool>('ai_tools').updateOne(editingTool.id, values)
+      setSubmitting(false)
+      if (updateError || !data) {
+        setError(updateError?.message ?? 'Something went wrong updating the tool.')
+        return
+      }
+      onUpdated?.(data)
+      return
+    }
+
+    const { data, error: insertError } = await iddb.table<Tool>('ai_tools').insertOne(values)
     setSubmitting(false)
 
     if (insertError || !data) {
@@ -87,19 +115,16 @@ export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">Add AI Tool</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{isEditing ? 'Edit AI Tool' : 'Add AI Tool'}</h3>
         <button
           type="button"
-          onClick={() => {
-            resetForm()
-            setOpen(false)
-          }}
+          onClick={handleCancel}
           className="text-xs font-medium text-slate-500 hover:text-slate-700"
         >
           Cancel
         </button>
       </div>
-      <p className="text-xs text-slate-400">Visible to everyone on the team once added.</p>
+      <p className="text-xs text-slate-400">Visible to everyone on the team once {isEditing ? 'saved' : 'added'}.</p>
 
       <div>
         <label htmlFor="add-tool-name" className="text-xs font-semibold text-slate-700">
@@ -190,7 +215,7 @@ export function AddAiToolForm({ onAdded }: AddAiToolFormProps) {
         disabled={submitting}
         className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
       >
-        {submitting ? 'Adding…' : 'Add tool for everyone'}
+        {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Add tool for everyone'}
       </button>
     </form>
   )

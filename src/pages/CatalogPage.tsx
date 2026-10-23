@@ -4,11 +4,13 @@ import { useTools } from '../hooks/useTools'
 import { ToolCard } from '../components/ToolCard'
 import { AddAiToolForm } from '../components/AddAiToolForm'
 import { EmptyState } from '../components/EmptyState'
+import type { Tool } from '../types'
 
 export function CatalogPage() {
-  const { tools, addTool } = useTools()
+  const { tools, addTool, updateTool, removeTool } = useTools()
   const [query, setQuery] = useState('')
   const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
+  const [editingTool, setEditingTool] = useState<Tool | null>(null)
 
   const filteredTools = useMemo(() => {
     return tools.filter((tool) => {
@@ -31,8 +33,20 @@ export function CatalogPage() {
             &amp; Gong resource inventory.
           </p>
         </div>
-        <AddAiToolForm onAdded={addTool} />
+        {!editingTool && <AddAiToolForm onAdded={addTool} />}
       </div>
+
+      {editingTool && (
+        <AddAiToolForm
+          onAdded={addTool}
+          editingTool={editingTool}
+          onUpdated={(tool) => {
+            updateTool(tool)
+            setEditingTool(null)
+          }}
+          onCancelEdit={() => setEditingTool(null)}
+        />
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
@@ -76,7 +90,7 @@ export function CatalogPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
+            <ToolCard key={tool.id} tool={tool} onEdit={setEditingTool} onDeleted={removeTool} />
           ))}
         </div>
       )}

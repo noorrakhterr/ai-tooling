@@ -25,5 +25,13 @@ export function useTools() {
     setTools((current) => [tool, ...current])
   }, [])
 
-  return { tools, loading, addTool, refresh }
+  const updateTool = useCallback((tool: Tool) => {
+    setTools((current) => current.map((existing) => (existing.id === tool.id ? tool : existing)))
+  }, [])
+
+  const removeTool = useCallback((id: string) => {
+    setTools((current) => current.filter((tool) => tool.id !== id))
+  }, [])
+
+  return { tools, loading, addTool, updateTool, removeTool, refresh }
 }

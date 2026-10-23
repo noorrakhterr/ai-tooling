@@ -1,10 +1,10 @@
 /**
  * Client for this app's own same-origin /api/* routes (see server.js), not
  * OAP's REST API directly. The browser never holds a database credential —
- * the Node server does that server-side, where IDDB_ANON_KEY is actually
- * available (it's a runtime secret, injected into the container process,
- * never into the client-side build). See git history around Oct 2026 for
- * why a static-SPA build couldn't do this.
+ * the Node server does that server-side, where IDDB_RESOURCE_KEY is
+ * actually available (it's a runtime secret, injected into the container
+ * process, never into the client-side build). See git history around Oct
+ * 2026 for why a static-SPA build couldn't do this.
  */
 
 export interface IddbResult<T> {
@@ -47,6 +47,19 @@ export const iddb = {
         return request<Row>(`/${name}`, {
           method: 'POST',
           body: JSON.stringify(values),
+        })
+      },
+      /** Update one row by id, returning the updated row. */
+      async updateOne(id: string, values: Partial<Row>): Promise<IddbResult<Row>> {
+        return request<Row>(`/${name}/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(values),
+        })
+      },
+      /** Delete one row by id. */
+      async deleteOne(id: string): Promise<IddbResult<null>> {
+        return request<null>(`/${name}/${id}`, {
+          method: 'DELETE',
         })
       },
     }

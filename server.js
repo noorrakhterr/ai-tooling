@@ -67,6 +67,23 @@ function tableRoutes(tableName) {
     res.status(201).json(Array.isArray(result.json) ? result.json[0] : result.json)
   })
 
+  router.patch('/:id', async (req, res) => {
+    const result = await restRequest(`/${tableName}?id=eq.${req.params.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(req.body),
+    })
+    if (!result.ok) return res.status(result.status).json({ error: result.json })
+    res.json(Array.isArray(result.json) ? result.json[0] : result.json)
+  })
+
+  router.delete('/:id', async (req, res) => {
+    const result = await restRequest(`/${tableName}?id=eq.${req.params.id}`, {
+      method: 'DELETE',
+    })
+    if (!result.ok) return res.status(result.status).json({ error: result.json })
+    res.status(204).end()
+  })
+
   return router
 }
 

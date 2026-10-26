@@ -94,6 +94,30 @@ function tableRoutes(tableName) {
 app.use('/api/ai_tools', tableRoutes('ai_tools'))
 app.use('/api/gong_recordings', tableRoutes('gong_recordings'))
 
+// TEMPORARY DIAGNOSTIC — checking whether/how OAP forwards the
+// authenticated user's identity to this server, for the comments/ratings
+// feature. Logs header NAMES only (never values) plus JWT claim NAMES if
+// an Authorization bearer token is present. Remove once answered.
+app.get('/api/_whoami', (req, res) => {
+  const headerNames = Object.keys(req.headers)
+  let jwtClaimNames = null
+  const auth = req.headers['authorization']
+  if (auth?.startsWith('Bearer ')) {
+    try {
+      const payload = auth.split('.')[1]
+      if (payload) {
+        const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'))
+        jwtClaimNames = Object.keys(decoded)
+      }
+    } catch {
+      jwtClaimNames = 'present but not a decodable JWT'
+    }
+  }
+  console.log(`whoami headers: ${headerNames.join(',')}`)
+  console.log(`whoami jwt claim names: ${JSON.stringify(jwtClaimNames)}`)
+  res.json({ headerNames, jwtClaimNames })
+})
+
 const distDir = path.join(__dirname, 'dist')
 app.use(express.static(distDir))
 app.get('/*splat', (_req, res) => {

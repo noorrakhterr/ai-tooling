@@ -8,6 +8,8 @@ interface PassportState {
   customTools: CustomTool[]
   /** Whether the passport has been dismissed from Home (all core phases stamped + user closed it). */
   passportDismissed: boolean
+  /** Whether the user has seen (or dismissed) the "what is the passport" intro popup. */
+  hasSeenPassportIntro: boolean
   stampPhase: (phaseId: string) => void
   unstampPhase: (phaseId: string) => void
   toggleFavorite: (toolId: string) => void
@@ -16,6 +18,7 @@ interface PassportState {
   addCustomTool: (tool: CustomTool) => void
   removeCustomTool: (toolId: string) => void
   dismissPassport: () => void
+  markPassportIntroSeen: () => void
 }
 
 export const usePassportStore = create<PassportState>()(
@@ -25,6 +28,7 @@ export const usePassportStore = create<PassportState>()(
       favoriteToolIds: [],
       customTools: [],
       passportDismissed: false,
+      hasSeenPassportIntro: false,
       stampPhase: (phaseId) =>
         set((state) => ({
           stampedPhaseIds: state.stampedPhaseIds.includes(phaseId)
@@ -47,6 +51,7 @@ export const usePassportStore = create<PassportState>()(
       removeCustomTool: (toolId) =>
         set((state) => ({ customTools: state.customTools.filter((tool) => tool.id !== toolId) })),
       dismissPassport: () => set({ passportDismissed: true }),
+      markPassportIntroSeen: () => set({ hasSeenPassportIntro: true }),
     }),
     { name: 'ai-tooling-passport' },
   ),

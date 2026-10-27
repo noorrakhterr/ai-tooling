@@ -5,6 +5,8 @@ import type { CustomTool } from '../types'
 interface PassportState {
   stampedPhaseIds: string[]
   favoriteToolIds: string[]
+  /** Gong call ids saved for later — personal, local, Gong-only (no effect on AI tools). */
+  savedRecordingIds: string[]
   customTools: CustomTool[]
   /** Whether the passport has been dismissed from Home (all core phases stamped + user closed it). */
   passportDismissed: boolean
@@ -17,8 +19,10 @@ interface PassportState {
   stampPhase: (phaseId: string) => void
   unstampPhase: (phaseId: string) => void
   toggleFavorite: (toolId: string) => void
+  toggleSavedRecording: (recordingId: string) => void
   isPhaseStamped: (phaseId: string) => boolean
   isToolFavorited: (toolId: string) => boolean
+  isRecordingSaved: (recordingId: string) => boolean
   addCustomTool: (tool: CustomTool) => void
   removeCustomTool: (toolId: string) => void
   dismissPassport: () => void
@@ -33,6 +37,7 @@ export const usePassportStore = create<PassportState>()(
     (set, get) => ({
       stampedPhaseIds: [],
       favoriteToolIds: [],
+      savedRecordingIds: [],
       customTools: [],
       passportDismissed: false,
       hasSeenPassportIntro: false,
@@ -55,8 +60,15 @@ export const usePassportStore = create<PassportState>()(
             ? state.favoriteToolIds.filter((id) => id !== toolId)
             : [...state.favoriteToolIds, toolId],
         })),
+      toggleSavedRecording: (recordingId) =>
+        set((state) => ({
+          savedRecordingIds: state.savedRecordingIds.includes(recordingId)
+            ? state.savedRecordingIds.filter((id) => id !== recordingId)
+            : [...state.savedRecordingIds, recordingId],
+        })),
       isPhaseStamped: (phaseId) => get().stampedPhaseIds.includes(phaseId),
       isToolFavorited: (toolId) => get().favoriteToolIds.includes(toolId),
+      isRecordingSaved: (recordingId) => get().savedRecordingIds.includes(recordingId),
       addCustomTool: (tool) => set((state) => ({ customTools: [...state.customTools, tool] })),
       removeCustomTool: (toolId) =>
         set((state) => ({ customTools: state.customTools.filter((tool) => tool.id !== toolId) })),

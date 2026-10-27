@@ -10,8 +10,8 @@ interface BulkImportGongCallsProps {
 }
 
 const SAMPLE_CSV = `title,link,customer,owner,callDate,labels,transcript
-Device Assurance Policy walkthrough,https://us-5814.app.gong.io/call?id=111,Acme Corp,Noor Akhter,2026-10-01,"FastPass, Device Assurance",
-FastPass rollout check-in,https://us-5814.app.gong.io/call?id=222,Globex,Iyana Johnson,2026-10-05,FastPass,
+Device Assurance Policy walkthrough,https://us-5814.app.gong.io/call?id=111,Acme Corp,Noor Akhter,2026-10-01,"FastPass, Device Assurance","Paste the call transcript here."
+FastPass rollout check-in,https://us-5814.app.gong.io/call?id=222,Globex,Iyana Johnson,2026-10-05,FastPass,"Paste the call transcript here."
 `
 
 function downloadSampleCsv() {
@@ -51,7 +51,8 @@ export function BulkImportGongCalls({ existingRecordings, onImported }: BulkImpo
       for (const row of rows) {
         const link = (row.link ?? '').trim()
         const title = (row.title ?? '').trim()
-        if (!link || !title) {
+        const transcript = (row.transcript ?? '').trim()
+        if (!link || !title || !transcript) {
           skipped++
           continue
         }
@@ -73,7 +74,7 @@ export function BulkImportGongCalls({ existingRecordings, onImported }: BulkImpo
           owner: row.owner?.trim() || undefined,
           callDate: row.callDate?.trim() || new Date().toISOString().slice(0, 10),
           labels,
-          transcript: row.transcript?.trim() || undefined,
+          transcript,
         })
 
         if (insertError || !data) {
@@ -105,47 +106,56 @@ export function BulkImportGongCalls({ existingRecordings, onImported }: BulkImpo
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">Import Gong calls from CSV</h3>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="text-xs font-medium text-slate-500 hover:text-slate-700"
-        >
-          Close
-        </button>
-      </div>
-      <p className="text-xs text-slate-500">
-        Columns: <code>title, link, customer, owner, callDate, labels, transcript</code>. Only{' '}
-        <code>title</code> and <code>link</code> are required; <code>labels</code> is
-        comma-separated within its own field (quote it, e.g. <code>"FastPass, Gold Scale"</code>).
-        Calls whose <code>link</code> already exists in the library are skipped automatically.
-      </p>
-      <div className="flex flex-wrap items-center gap-3">
-        <input
-          type="file"
-          accept=".csv,text/csv"
-          onChange={handleFileChange}
-          disabled={importing}
-          className="text-sm text-slate-600"
-        />
-        <button
-          type="button"
-          onClick={downloadSampleCsv}
-          className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
-        >
-          Download sample CSV
-        </button>
-      </div>
-      {importing && <p className="text-xs text-slate-500">Importing…</p>}
-      {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
-      {result && (
-        <p className="text-xs font-medium text-emerald-700">
-          Added {result.added} new call{result.added === 1 ? '' : 's'}
-          {result.skipped > 0 ? ` — skipped ${result.skipped} (already in the library or missing data)` : ''}.
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      onClick={() => setOpen(false)}
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="flex max-h-[85vh] w-full max-w-2xl flex-col gap-3 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-900">Import Gong calls from CSV</h3>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="text-xs font-medium text-slate-500 hover:text-slate-700"
+          >
+            Close
+          </button>
+        </div>
+        <p className="text-xs text-slate-500">
+          Columns: <code>title, link, customer, owner, callDate, labels, transcript</code>.{' '}
+          <code>title</code>, <code>link</code>, and <code>transcript</code> are required;{' '}
+          <code>labels</code> is comma-separated within its own field (quote it, e.g.{' '}
+          <code>"FastPass, Gold Scale"</code>). Rows missing a required field, or whose{' '}
+          <code>link</code> already exists in the library, are skipped automatically.
         </p>
-      )}
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleFileChange}
+            disabled={importing}
+            className="text-sm text-slate-600"
+          />
+          <button
+            type="button"
+            onClick={downloadSampleCsv}
+            className="text-xs font-medium text-brand-600 hover:text-brand-700"
+          >
+            Download sample CSV
+          </button>
+        </div>
+        {importing && <p className="text-xs text-slate-500">Importing…</p>}
+        {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
+        {result && (
+          <p className="text-xs font-medium text-emerald-700">
+            Added {result.added} new call{result.added === 1 ? '' : 's'}
+            {result.skipped > 0 ? ` — skipped ${result.skipped} (already in the library or missing data)` : ''}.
+          </p>
+        )}
+      </div>
     </div>
   )
 }

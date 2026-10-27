@@ -51,11 +51,19 @@ export interface ToolComment {
   createdAt: string
 }
 
+export interface ReferenceResourceLink {
+  label: string
+  url: string
+}
+
 export interface ReferenceResource {
   id: string
   title: string
   description: string
-  link: string
+  /** Single-link resources open directly. */
+  link?: string
+  /** Grouped resources show an "Open links" button that opens a popup listing each one. */
+  links?: ReferenceResourceLink[]
 }
 
 export interface CustomTool {

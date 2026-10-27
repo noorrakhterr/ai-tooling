@@ -42,7 +42,7 @@ export function PassportIntroModal({ onClose }: PassportIntroModalProps) {
         <button
           type="button"
           onClick={onClose}
-          className="mt-5 w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+          className="mt-5 w-full rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
         >
           Got it
         </button>

@@ -7,6 +7,7 @@ import { ToolCard } from '../components/ToolCard'
 import { AddAiToolForm } from '../components/AddAiToolForm'
 import { EmptyState } from '../components/EmptyState'
 import { GuideModal } from '../components/GuideModal'
+import { FilterSelect } from '../components/FilterSelect'
 import { usePassportStore } from '../state/usePassportStore'
 import type { Tool } from '../types'
 
@@ -58,19 +59,15 @@ export function CatalogPage() {
 
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
-            <p className="mt-1 text-sm text-slate-500">
-              Some entries are validated and ready to use; others are placeholders pending the full AI
-              &amp; Gong resource inventory.
-            </p>
-          </div>
+          <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
           <button
             type="button"
             onClick={() => setGuideOpen(true)}
-            className="flex-shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            aria-label="How to use the Tool Catalog"
+            title="How to use the Tool Catalog"
+            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
           >
-            How to use this
+            ?
           </button>
         </div>
         {!editingTool && !openAddFromPhase && <AddAiToolForm onAdded={addTool} />}
@@ -90,51 +87,32 @@ export function CatalogPage() {
 
       {!editingTool && openAddFromPhase && <AddAiToolForm onAdded={addTool} initialPhaseId={initialPhaseId} />}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-wrap items-center gap-2">
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search tools…"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none sm:max-w-xs"
+          className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none sm:max-w-xs"
         />
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setPhaseFilter('all')}
-            className={[
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-              phaseFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
-            ].join(' ')}
-          >
-            All phases
-          </button>
+        <FilterSelect value={phaseFilter} onChange={setPhaseFilter}>
+          <option value="all">All phases</option>
           {ALL_PHASES.map((phase) => (
-            <button
-              key={phase.id}
-              type="button"
-              onClick={() => setPhaseFilter(phase.id)}
-              className={[
-                'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                phaseFilter === phase.id
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
-              ].join(' ')}
-            >
+            <option key={phase.id} value={phase.id}>
               {phase.title}
-            </button>
+            </option>
           ))}
-          <button
-            type="button"
-            onClick={() => setSortByMostUsed((current) => !current)}
-            className={[
-              'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-              sortByMostUsed ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
-            ].join(' ')}
-          >
-            Sort: Most used
-          </button>
-        </div>
+        </FilterSelect>
+        <button
+          type="button"
+          onClick={() => setSortByMostUsed((current) => !current)}
+          className={[
+            'flex-shrink-0 rounded-full px-3 py-2 text-sm transition-colors',
+            sortByMostUsed ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+          ].join(' ')}
+        >
+          Sort: Most used
+        </button>
       </div>
 
       {displayedTools.length === 0 ? (

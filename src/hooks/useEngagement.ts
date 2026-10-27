@@ -52,23 +52,48 @@ export function useEngagement() {
   )
 
   const myUsageForTool = useCallback(
-    (toolId: string) => usageByToolId.get(toolId)?.find((row) => row.userEmail === currentUserEmail),
+    (toolId: string) =>
+      usageByToolId
+        .get(toolId)
+        ?.find((row) => row.userEmail === currentUserEmail || row.id.startsWith('pending-')),
     [usageByToolId, currentUserEmail],
   )
 
+  /**
+   * Flips the star/usage state immediately in local state (optimistic — the
+   * star fills/empties without waiting on the network round-trip), then
+   * reconciles with the server in the background. Safe to call repeatedly
+   * in quick succession (e.g. toggle, then "Undo") — each call just flips
+   * whatever the current local state is.
+   */
   const toggleUsage = useCallback(
-    async (toolId: string) => {
+    (toolId: string) => {
       const existing = myUsageForTool(toolId)
+
       if (existing) {
         setUsage((current) => current.filter((row) => row.id !== existing.id))
-        const { error } = await iddb.table<ToolUsage>('tool_usage').deleteOne(existing.id)
-        if (error) setUsage((current) => [...current, existing])
+        iddb
+          .table<ToolUsage>('tool_usage')
+          .deleteOne(existing.id)
+          .then(({ error }) => {
+            if (error) setUsage((current) => [...current, existing])
+          })
         return
       }
-      const { data, error } = await iddb.table<ToolUsage>('tool_usage').insertOne({ toolId })
-      if (!error && data) setUsage((current) => [...current, data])
+
+      const placeholderId = `pending-${toolId}-${Date.now()}`
+      setUsage((current) => [...current, { id: placeholderId, toolId, userEmail: currentUserEmail ?? '' }])
+      iddb
+        .table<ToolUsage>('tool_usage')
+        .insertOne({ toolId })
+        .then(({ data, error }) => {
+          setUsage((current) => {
+            const withoutPlaceholder = current.filter((row) => row.id !== placeholderId)
+            return error || !data ? withoutPlaceholder : [...withoutPlaceholder, data]
+          })
+        })
     },
-    [myUsageForTool],
+    [myUsageForTool, currentUserEmail],
   )
 
   const addComment = useCallback(async (toolId: string, body: string) => {

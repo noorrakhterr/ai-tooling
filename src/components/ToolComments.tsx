@@ -82,13 +82,13 @@ export function ToolComments({ comments, currentUserEmail, onAdd, onDelete }: To
               onChange={(event) => setBody(event.target.value)}
               placeholder="Share a note or what you liked about this tool…"
               rows={2}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
             />
             {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
             <button
               type="submit"
               disabled={submitting || !body.trim()}
-              className="self-start rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
+              className="self-start rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
             >
               {submitting ? 'Posting…' : 'Post'}
             </button>

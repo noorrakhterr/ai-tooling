@@ -20,18 +20,18 @@ export function PassportBanner() {
   return (
     <Link
       to="/passport"
-      className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-700 px-4 py-3 text-white shadow-sm transition-opacity hover:opacity-90"
+      className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-gradient-to-br from-brand-600 via-brand-600 to-accent-700 px-4 py-3 text-white shadow-sm transition-opacity hover:opacity-90"
     >
       <div className="flex items-center gap-3">
         <span className="text-sm font-semibold">
           {coreStampedCount} of {CORE_PHASES.length} stamped
         </span>
         {!isComplete && nextPhase && (
-          <span className="text-xs text-indigo-100">Next up: {nextPhase.title}</span>
+          <span className="text-xs text-brand-100">Next up: {nextPhase.title}</span>
         )}
-        {isComplete && <span className="text-xs text-indigo-100">Passport complete</span>}
+        {isComplete && <span className="text-xs text-brand-100">Passport complete</span>}
       </div>
-      <span className="text-xs font-medium text-indigo-100">View passport →</span>
+      <span className="text-xs font-medium text-brand-100">View passport →</span>
     </Link>
   )
 }

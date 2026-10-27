@@ -1,8 +1,73 @@
 @import "tailwindcss";
 
+/* Okta brand fonts, self-hosted per theming-okta-branding skill —
+   internal-use-only binaries, see public/fonts/ and that skill's
+   assets/fonts/LICENSE.md. */
+@font-face {
+  font-family: "Season Mix";
+  src: url("/fonts/SeasonMix-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Season Mix";
+  src: url("/fonts/SeasonMix-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("/fonts/Aeonik-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Lora", ui-serif, Georgia, serif;
+  --font-sans: "Aeonik", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Season Mix", ui-serif, Georgia, serif;
+
+  /* Okta brand core palette */
+  --color-okta-black: #000000;
+  --color-okta-navy-500: #00033e;
+  --color-okta-blue-300: #0131ff;
+  --color-okta-purple-300: #9921fe;
+  --color-okta-orange-300: #ff6217;
+  --color-okta-neutral-200: #ece8e4;
+
+  /* "brand" scale replaces the old indigo usage — Blue 300 as the 600
+     step (primary action), Navy 500 as the 700 step (hover/deep). */
+  --color-brand-50: #e8ecff;
+  --color-brand-100: #d6ddff;
+  --color-brand-200: #b8c4ff;
+  --color-brand-300: #8a9bff;
+  --color-brand-500: #2e52ff;
+  --color-brand-600: #0131ff;
+  --color-brand-700: #00033e;
+
+  /* "accent" scale replaces the old violet usage — Purple 300. */
+  --color-accent-50: #f0e1ff;
+  --color-accent-700: #7a1ad1;
 }
 
 :root {

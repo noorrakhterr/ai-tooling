@@ -27,10 +27,10 @@ export function PassportFull({ showPhaseDetail = true }: PassportFullProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-700 p-6 text-white shadow-lg">
+      <section className="rounded-2xl bg-gradient-to-br from-brand-600 via-brand-600 to-accent-700 p-6 text-white shadow-lg">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-indigo-100">AI enablement passport</p>
+            <p className="text-sm font-medium text-brand-100">AI Enablement Passport</p>
             <h1 className="font-heading mt-1 text-2xl font-semibold">
               {coreStampedCount} of {CORE_PHASES.length} phases stamped
             </h1>
@@ -49,7 +49,7 @@ export function PassportFull({ showPhaseDetail = true }: PassportFullProps) {
           ) : (
             nextPhase && (
               <div className="rounded-xl bg-white/15 px-4 py-2 text-right">
-                <p className="text-xs text-indigo-100">Next up</p>
+                <p className="text-xs text-brand-100">Next up</p>
                 <p className="text-sm font-semibold">{nextPhase.title}</p>
               </div>
             )
@@ -59,12 +59,14 @@ export function PassportFull({ showPhaseDetail = true }: PassportFullProps) {
           phases={CORE_PHASES}
           selectedPhaseId={selectedPhaseId}
           onSelectPhase={setSelectedPhaseId}
+          interactive={showPhaseDetail}
         />
         <div className="mt-5">
           <BonusStampRow
             phases={BONUS_PHASES}
             selectedPhaseId={selectedPhaseId}
             onSelectPhase={setSelectedPhaseId}
+            interactive={showPhaseDetail}
           />
         </div>
       </section>

@@ -6,9 +6,10 @@ import { PassportPage } from './pages/PassportPage'
 import { CatalogPage } from './pages/CatalogPage'
 import { GongLibraryPage } from './pages/GongLibraryPage'
 import { MyToolsPage } from './pages/MyToolsPage'
+import { SavedCallsPage } from './pages/SavedCallsPage'
 import { WorkflowsPage } from './pages/WorkflowsPage'
 
-const ROUTES_WITHOUT_BANNER = ['/', '/passport']
+const ROUTES_WITHOUT_BANNER = ['/', '/passport', '/gong-library', '/my-tools', '/saved-calls']
 
 function App() {
   const location = useLocation()
@@ -26,6 +27,7 @@ function App() {
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/gong-library" element={<GongLibraryPage />} />
             <Route path="/my-tools" element={<MyToolsPage />} />
+            <Route path="/saved-calls" element={<SavedCallsPage />} />
             <Route path="/workflows" element={<WorkflowsPage />} />
           </Routes>
         </div>

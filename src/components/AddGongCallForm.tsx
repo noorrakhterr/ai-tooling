@@ -55,6 +55,10 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
       setError('Add the Gong link.')
       return
     }
+    if (!transcript.trim()) {
+      setError('Add the call transcript.')
+      return
+    }
 
     const labels = labelsInput
       .split(',')
@@ -67,7 +71,7 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
       customer: customer.trim() || undefined,
       owner: owner.trim() || undefined,
       labels,
-      transcript: transcript.trim() || undefined,
+      transcript: transcript.trim(),
     }
 
     setSubmitting(true)
@@ -105,7 +109,7 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
+        className="self-start rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
       >
         Add Gong Call
       </button>
@@ -113,114 +117,120 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">{isEditing ? 'Edit Gong Call' : 'Add Gong Call'}</h3>
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="text-xs font-medium text-slate-500 hover:text-slate-700"
-        >
-          Cancel
-        </button>
-      </div>
-      <p className="text-xs text-slate-400">Visible to everyone on the team once {isEditing ? 'saved' : 'added'}.</p>
-
-      <div>
-        <label htmlFor="add-call-title" className="text-xs font-semibold text-slate-700">
-          Title
-        </label>
-        <input
-          id="add-call-title"
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          placeholder="e.g. Device Assurance Policy walkthrough"
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="add-call-link" className="text-xs font-semibold text-slate-700">
-          Gong link
-        </label>
-        <input
-          id="add-call-link"
-          type="text"
-          value={link}
-          onChange={(event) => setLink(event.target.value)}
-          placeholder="https://…app.gong.io/call?id=…"
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="add-call-customer" className="text-xs font-semibold text-slate-700">
-            Customer (optional)
-          </label>
-          <input
-            id="add-call-customer"
-            type="text"
-            value={customer}
-            onChange={(event) => setCustomer(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-          />
-        </div>
-        <div>
-          <label htmlFor="add-call-owner" className="text-xs font-semibold text-slate-700">
-            Owner (optional)
-          </label>
-          <input
-            id="add-call-owner"
-            type="text"
-            value={owner}
-            onChange={(event) => setOwner(event.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="add-call-labels" className="text-xs font-semibold text-slate-700">
-          Labels (comma-separated)
-        </label>
-        <input
-          id="add-call-labels"
-          type="text"
-          value={labelsInput}
-          onChange={(event) => setLabelsInput(event.target.value)}
-          placeholder="e.g. FastPass, Device Assurance"
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="add-call-transcript" className="text-xs font-semibold text-slate-700">
-          Transcript (optional)
-        </label>
-        <textarea
-          id="add-call-transcript"
-          value={transcript}
-          onChange={(event) => setTranscript(event.target.value)}
-          placeholder="Paste the call transcript, if you have it."
-          rows={4}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
-        />
-        <p className="mt-1 text-xs text-slate-400">
-          Not used anywhere yet — saved for a possible future "find me an example call" search feature.
-        </p>
-      </div>
-
-      {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" onClick={handleCancel}>
+      <form
+        onSubmit={handleSubmit}
+        onClick={(event) => event.stopPropagation()}
+        className="flex max-h-[85vh] w-full max-w-2xl flex-col gap-4 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
       >
-        {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Add call for everyone'}
-      </button>
-    </form>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-900">{isEditing ? 'Edit Gong Call' : 'Add Gong Call'}</h3>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="text-xs font-medium text-slate-500 hover:text-slate-700"
+          >
+            Cancel
+          </button>
+        </div>
+        <p className="text-xs text-slate-400">Visible to everyone on the team once {isEditing ? 'saved' : 'added'}.</p>
+
+        <div>
+          <label htmlFor="add-call-title" className="text-xs font-semibold text-slate-700">
+            Title
+          </label>
+          <input
+            id="add-call-title"
+            type="text"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="e.g. Device Assurance Policy walkthrough"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="add-call-link" className="text-xs font-semibold text-slate-700">
+            Gong link
+          </label>
+          <input
+            id="add-call-link"
+            type="text"
+            value={link}
+            onChange={(event) => setLink(event.target.value)}
+            placeholder="https://…app.gong.io/call?id=…"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="add-call-customer" className="text-xs font-semibold text-slate-700">
+              Customer (optional)
+            </label>
+            <input
+              id="add-call-customer"
+              type="text"
+              value={customer}
+              onChange={(event) => setCustomer(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label htmlFor="add-call-owner" className="text-xs font-semibold text-slate-700">
+              Owner (optional)
+            </label>
+            <input
+              id="add-call-owner"
+              type="text"
+              value={owner}
+              onChange={(event) => setOwner(event.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="add-call-labels" className="text-xs font-semibold text-slate-700">
+            Labels (comma-separated)
+          </label>
+          <input
+            id="add-call-labels"
+            type="text"
+            value={labelsInput}
+            onChange={(event) => setLabelsInput(event.target.value)}
+            placeholder="e.g. FastPass, Device Assurance"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="add-call-transcript" className="text-xs font-semibold text-slate-700">
+            Transcript
+          </label>
+          <textarea
+            id="add-call-transcript"
+            value={transcript}
+            onChange={(event) => setTranscript(event.target.value)}
+            placeholder="Paste the call transcript."
+            rows={4}
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          />
+          <p className="mt-1 text-xs text-slate-400">
+            Not used for search yet — saved for a possible future "find me an example call" feature.
+          </p>
+        </div>
+
+        {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="self-start rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
+        >
+          {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Add call for everyone'}
+        </button>
+      </form>
+    </div>
   )
 }

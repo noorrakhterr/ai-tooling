@@ -3,6 +3,7 @@ import type { Tool, ToolComment } from '../types'
 import { usePassportStore } from '../state/usePassportStore'
 import { iddb } from '../lib/iddb'
 import { ToolComments } from './ToolComments'
+import { getPhaseById } from '../data/phases'
 
 interface ToolCardEngagement {
   usageCount: number
@@ -27,11 +28,11 @@ interface ToolCardProps {
 
 const TYPE_STYLES: Record<Tool['type'], string> = {
   'Gong resource': 'bg-amber-50 text-amber-700',
-  Gem: 'bg-indigo-50 text-indigo-700',
+  Gem: 'bg-brand-50 text-brand-700',
   Agent: 'bg-fuchsia-50 text-fuchsia-700',
   Skill: 'bg-emerald-50 text-emerald-700',
   Prompt: 'bg-sky-50 text-sky-700',
-  Notebook: 'bg-violet-50 text-violet-700',
+  Notebook: 'bg-accent-50 text-accent-700',
   Other: 'bg-slate-100 text-slate-700',
 }
 
@@ -41,13 +42,25 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
   const stampPhase = usePassportStore((state) => state.stampPhase)
   const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
   const [deleting, setDeleting] = useState(false)
+  const [showUndoStar, setShowUndoStar] = useState(false)
 
   const favorited = engagement ? engagement.isUsingIt : isToolFavorited(tool.id)
   const phaseStamped = phaseIdToStamp ? isPhaseStamped(phaseIdToStamp) : false
 
   const handleToggleStar = () => {
+    const turningOn = !favorited
     toggleFavorite(tool.id)
     engagement?.onToggleUsage()
+    setShowUndoStar(turningOn)
+    if (turningOn) {
+      setTimeout(() => setShowUndoStar(false), 5000)
+    }
+  }
+
+  const handleUndoStar = () => {
+    toggleFavorite(tool.id)
+    engagement?.onToggleUsage()
+    setShowUndoStar(false)
   }
 
   const handleDelete = async () => {
@@ -77,19 +90,46 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
             )}
           </div>
           <h3 className="mt-2 text-sm font-semibold text-slate-900">{tool.name}</h3>
+          {tool.phaseIds.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {tool.phaseIds.map((phaseId) => {
+                const phase = getPhaseById(phaseId)
+                if (!phase) return null
+                return (
+                  <span
+                    key={phaseId}
+                    className="inline-block rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500"
+                  >
+                    {phase.title}
+                  </span>
+                )
+              })}
+            </div>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={handleToggleStar}
-          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
-          aria-pressed={favorited}
-          className={[
-            'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-lg transition-colors',
-            favorited ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400 hover:text-amber-500',
-          ].join(' ')}
-        >
-          {favorited ? '★' : '☆'}
-        </button>
+        <div className="flex flex-shrink-0 flex-col items-end gap-1">
+          <button
+            type="button"
+            onClick={handleToggleStar}
+            aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+            aria-pressed={favorited}
+            className={[
+              'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-lg transition-colors',
+              favorited ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400 hover:text-amber-500',
+            ].join(' ')}
+          >
+            {favorited ? '★' : '☆'}
+          </button>
+          {showUndoStar && (
+            <button
+              type="button"
+              onClick={handleUndoStar}
+              className="text-xs font-medium text-brand-600 hover:text-brand-700"
+            >
+              Undo
+            </button>
+          )}
+        </div>
       </div>
       <p className="text-sm text-slate-600">{tool.description}</p>
       {engagement && !tool.comingSoon && (
@@ -113,7 +153,7 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
         ) : tool.link ? (
           <a
             href={tool.link}
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            className="text-sm font-medium text-brand-600 hover:text-brand-700"
             target="_blank"
             rel="noreferrer"
           >
@@ -131,7 +171,7 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
               'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
               phaseStamped
                 ? 'cursor-default bg-emerald-100 text-emerald-700'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700',
+                : 'bg-brand-600 text-white hover:bg-brand-700',
             ].join(' ')}
           >
             {phaseStamped ? 'Stamped ✓' : "I used this"}

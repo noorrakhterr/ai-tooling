@@ -9,7 +9,7 @@ interface GuideModalProps {
 /** A "how to use this page" panel, pinned at the top of the page content (not an overlay). */
 export function GuideModal({ title, children, onClose }: GuideModalProps) {
   return (
-    <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+    <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5">
       <div className="flex items-start justify-between gap-4">
         <h2 className="font-heading text-base font-semibold text-slate-900">{title}</h2>
         <button

@@ -114,7 +114,7 @@ export function AddAiToolForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
+        className="self-start rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
       >
         Add AI Tool
       </button>
@@ -150,7 +150,7 @@ export function AddAiToolForm({
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="e.g. Transcript to Followup Email Gem"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
           />
         </div>
 
@@ -162,7 +162,7 @@ export function AddAiToolForm({
             id="add-tool-type"
             value={type}
             onChange={(event) => setType(event.target.value as ToolType)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
           >
             {TOOL_TYPES.map((toolType) => (
               <option key={toolType} value={toolType}>
@@ -182,7 +182,7 @@ export function AddAiToolForm({
             onChange={(event) => setDescription(event.target.value)}
             placeholder="What does this tool do, and when should a CSM use it?"
             rows={3}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
           />
         </div>
 
@@ -196,7 +196,7 @@ export function AddAiToolForm({
             value={link}
             onChange={(event) => setLink(event.target.value)}
             placeholder="https://…"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
           />
           {(type === 'Prompt' || type === 'Skill') && (
             <p className="mt-1 text-xs text-slate-400">
@@ -217,7 +217,7 @@ export function AddAiToolForm({
                   onClick={() => togglePhase(phase.id)}
                   className={[
                     'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                    isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                    isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
                   ].join(' ')}
                 >
                   {phase.title}
@@ -232,7 +232,7 @@ export function AddAiToolForm({
         <button
           type="submit"
           disabled={submitting}
-          className="self-start rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
+          className="self-start rounded-full bg-brand-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
         >
           {submitting ? 'Saving…' : isEditing ? 'Save changes' : 'Add tool for everyone'}
         </button>

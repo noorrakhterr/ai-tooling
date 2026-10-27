@@ -38,7 +38,7 @@ export function CustomToolCard({ tool }: CustomToolCardProps) {
       <a
         href={tool.fileDataUrl}
         download={tool.fileName}
-        className="mt-auto text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        className="mt-auto text-sm font-medium text-brand-600 hover:text-brand-700"
       >
         Download →
       </a>

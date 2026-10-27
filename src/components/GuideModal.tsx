@@ -6,27 +6,21 @@ interface GuideModalProps {
   onClose: () => void
 }
 
-/** Generic version of PassportIntroModal's shell, for per-page "how to use this page" guides. */
+/** A "how to use this page" panel, pinned at the top of the page content (not an overlay). */
 export function GuideModal({ title, children, onClose }: GuideModalProps) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="max-w-md rounded-2xl bg-white p-6 shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 className="font-heading text-xl font-semibold text-slate-900">{title}</h2>
-        <div className="mt-4 flex flex-col gap-3 text-sm text-slate-600">{children}</div>
+    <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+      <div className="flex items-start justify-between gap-4">
+        <h2 className="font-heading text-base font-semibold text-slate-900">{title}</h2>
         <button
           type="button"
           onClick={onClose}
-          className="mt-5 w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+          className="flex-shrink-0 text-xs font-medium text-slate-500 hover:text-slate-700"
         >
-          Got it
+          Close
         </button>
       </div>
+      <div className="mt-3 flex flex-col gap-2 text-sm text-slate-700">{children}</div>
     </div>
   )
 }

@@ -26,6 +26,10 @@ export function useRecordings() {
     setRecordings((current) => [recording, ...current])
   }, [])
 
+  const addRecordings = useCallback((newRecordings: Recording[]) => {
+    setRecordings((current) => [...newRecordings, ...current])
+  }, [])
+
   const updateRecording = useCallback((recording: Recording) => {
     setRecordings((current) =>
       current.map((existing) => (existing.id === recording.id ? recording : existing)),
@@ -36,5 +40,5 @@ export function useRecordings() {
     setRecordings((current) => current.filter((recording) => recording.id !== id))
   }, [])
 
-  return { recordings, loading, addRecording, updateRecording, removeRecording, refresh }
+  return { recordings, loading, addRecording, addRecordings, updateRecording, removeRecording, refresh }
 }

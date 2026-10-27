@@ -74,10 +74,6 @@ export function AddAiToolForm({
       setError('Add a short description.')
       return
     }
-    if (!link.trim()) {
-      setError('Add a link.')
-      return
-    }
 
     const values = {
       name: name.trim(),
@@ -192,7 +188,7 @@ export function AddAiToolForm({
 
         <div>
           <label htmlFor="add-tool-link" className="text-xs font-semibold text-slate-700">
-            Link
+            Link (optional)
           </label>
           <input
             id="add-tool-link"
@@ -202,6 +198,11 @@ export function AddAiToolForm({
             placeholder="https://…"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
           />
+          {(type === 'Prompt' || type === 'Skill') && (
+            <p className="mt-1 text-xs text-slate-400">
+              No link handy? Paste the content into a doc and paste the doc link here.
+            </p>
+          )}
         </div>
 
         <div>

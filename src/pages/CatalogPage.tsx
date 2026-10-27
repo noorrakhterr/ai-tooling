@@ -45,6 +45,17 @@ export function CatalogPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      {guideOpen && (
+        <GuideModal title="How to use this" onClose={closeGuide}>
+          <p>
+            Sort tools by filters or search. Click the star to add to My Tools. When you click "My
+            Tools," the site indicates that you use this tool. You can also leave a comment on a
+            tool you have feedback for or want to show appreciation for.
+          </p>
+          <p>You can also add a tool to our repository by clicking Add AI Tool.</p>
+        </GuideModal>
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
           <div>
@@ -57,26 +68,13 @@ export function CatalogPage() {
           <button
             type="button"
             onClick={() => setGuideOpen(true)}
-            aria-label="How to use the Tool Catalog"
-            title="How to use the Tool Catalog"
-            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            className="flex-shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
           >
-            ?
+            How to use this
           </button>
         </div>
         {!editingTool && !openAddFromPhase && <AddAiToolForm onAdded={addTool} />}
       </div>
-
-      {guideOpen && (
-        <GuideModal title="Using the Tool Catalog" onClose={closeGuide}>
-          <p>
-            Sort tools by filters or search. Click the star to add to My Tools. When you click "My
-            Tools," the site indicates that you use this tool. You can also leave a comment on a
-            tool you have feedback for or want to show appreciation for.
-          </p>
-          <p>You can also add a tool to our repository by clicking Add AI Tool.</p>
-        </GuideModal>
-      )}
 
       {editingTool && (
         <AddAiToolForm

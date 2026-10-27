@@ -110,7 +110,7 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
       <div className="mt-auto flex items-center justify-between gap-2 pt-1">
         {tool.comingSoon ? (
           <span className="text-sm font-medium text-slate-400">Not yet available</span>
-        ) : (
+        ) : tool.link ? (
           <a
             href={tool.link}
             className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
@@ -119,6 +119,8 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
           >
             Open tool →
           </a>
+        ) : (
+          <span className="text-sm font-medium text-slate-400">No link provided</span>
         )}
         {phaseIdToStamp && !tool.comingSoon && (
           <button

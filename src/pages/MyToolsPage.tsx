@@ -32,6 +32,15 @@ export function MyToolsPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      {guideOpen && (
+        <GuideModal title="How to use this" onClose={closeGuide}>
+          <p>
+            This holds all the tools you've starred for easy access. You can also add your own
+            tool here without having it be shared with the entire team.
+          </p>
+        </GuideModal>
+      )}
+
       <div className="flex items-center gap-2">
         <div>
           <h1 className="text-xl font-semibold text-slate-900">My Tools</h1>
@@ -42,22 +51,11 @@ export function MyToolsPage() {
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
-          aria-label="How to use My Tools"
-          title="How to use My Tools"
-          className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+          className="flex-shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
         >
-          ?
+          How to use this
         </button>
       </div>
-
-      {guideOpen && (
-        <GuideModal title="Using My Tools" onClose={closeGuide}>
-          <p>
-            This holds all the tools you've starred for easy access. You can also add your own
-            tool here without having it be shared with the entire team.
-          </p>
-        </GuideModal>
-      )}
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">

@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react'
 import { useRecordings } from '../hooks/useRecordings'
 import { RecordingCard } from '../components/RecordingCard'
 import { AddGongCallForm } from '../components/AddGongCallForm'
+import { BulkImportGongCalls } from '../components/BulkImportGongCalls'
 import { EmptyState } from '../components/EmptyState'
 import { GuideModal } from '../components/GuideModal'
 import { usePassportStore } from '../state/usePassportStore'
 import type { Recording } from '../types'
 
 export function GongLibraryPage() {
-  const { recordings, addRecording, updateRecording, removeRecording } = useRecordings()
+  const { recordings, addRecording, addRecordings, updateRecording, removeRecording } = useRecordings()
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState<string | 'all'>('all')
   const [editingRecording, setEditingRecording] = useState<Recording | null>(null)
@@ -42,6 +43,15 @@ export function GongLibraryPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      {guideOpen && (
+        <GuideModal title="How to use this" onClose={closeGuide}>
+          <p>
+            Access the team's useful Gong calls. Filter or search at the top. You can add a call
+            of your own or one you found useful by clicking Add Gong Call.
+          </p>
+        </GuideModal>
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
           <div>
@@ -53,24 +63,18 @@ export function GongLibraryPage() {
           <button
             type="button"
             onClick={() => setGuideOpen(true)}
-            aria-label="How to use the Gong Library"
-            title="How to use the Gong Library"
-            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            className="flex-shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
           >
-            ?
+            How to use this
           </button>
         </div>
-        {!editingRecording && <AddGongCallForm onAdded={addRecording} />}
+        {!editingRecording && (
+          <div className="flex flex-shrink-0 items-start gap-2">
+            <AddGongCallForm onAdded={addRecording} />
+            <BulkImportGongCalls existingRecordings={recordings} onImported={addRecordings} />
+          </div>
+        )}
       </div>
-
-      {guideOpen && (
-        <GuideModal title="Using the Gong Library" onClose={closeGuide}>
-          <p>
-            Access the team's useful Gong calls. Filter or search at the top. You can add a call
-            of your own or one you found useful by clicking Add Gong Call.
-          </p>
-        </GuideModal>
-      )}
 
       {editingRecording && (
         <AddGongCallForm

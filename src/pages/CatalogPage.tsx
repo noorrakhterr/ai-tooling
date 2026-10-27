@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ALL_PHASES } from '../data/phases'
 import { useTools } from '../hooks/useTools'
+import { useEngagement } from '../hooks/useEngagement'
 import { ToolCard } from '../components/ToolCard'
 import { AddAiToolForm } from '../components/AddAiToolForm'
 import { EmptyState } from '../components/EmptyState'
@@ -8,12 +9,14 @@ import type { Tool } from '../types'
 
 export function CatalogPage() {
   const { tools, addTool, updateTool, removeTool } = useTools()
+  const engagement = useEngagement()
   const [query, setQuery] = useState('')
   const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
+  const [sortByMostUsed, setSortByMostUsed] = useState(false)
 
-  const filteredTools = useMemo(() => {
-    return tools.filter((tool) => {
+  const displayedTools = useMemo(() => {
+    const matches = tools.filter((tool) => {
       const matchesQuery =
         query.trim() === '' ||
         tool.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -21,7 +24,9 @@ export function CatalogPage() {
       const matchesPhase = phaseFilter === 'all' || tool.phaseIds.includes(phaseFilter)
       return matchesQuery && matchesPhase
     })
-  }, [tools, query, phaseFilter])
+    if (!sortByMostUsed) return matches
+    return [...matches].sort((a, b) => engagement.usageCountForTool(b.id) - engagement.usageCountForTool(a.id))
+  }, [tools, query, phaseFilter, sortByMostUsed, engagement])
 
   return (
     <div className="flex flex-col gap-5">
@@ -82,15 +87,39 @@ export function CatalogPage() {
               {phase.title}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setSortByMostUsed((current) => !current)}
+            className={[
+              'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+              sortByMostUsed ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+            ].join(' ')}
+          >
+            Sort: Most used
+          </button>
         </div>
       </div>
 
-      {filteredTools.length === 0 ? (
+      {displayedTools.length === 0 ? (
         <EmptyState title="No tools match" message="Try a different search term or phase filter." />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredTools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} onEdit={setEditingTool} onDeleted={removeTool} />
+          {displayedTools.map((tool) => (
+            <ToolCard
+              key={tool.id}
+              tool={tool}
+              onEdit={setEditingTool}
+              onDeleted={removeTool}
+              engagement={{
+                usageCount: engagement.usageCountForTool(tool.id),
+                isUsingIt: Boolean(engagement.myUsageForTool(tool.id)),
+                onToggleUsage: () => engagement.toggleUsage(tool.id),
+                comments: engagement.commentsByToolId.get(tool.id) ?? [],
+                currentUserEmail: engagement.currentUserEmail,
+                onAddComment: (body) => engagement.addComment(tool.id, body),
+                onDeleteComment: engagement.deleteComment,
+              }}
+            />
           ))}
         </div>
       )}

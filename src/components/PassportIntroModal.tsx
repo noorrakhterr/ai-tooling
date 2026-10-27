@@ -12,15 +12,17 @@ export function PassportIntroModal({ onClose }: PassportIntroModalProps) {
         className="max-w-md rounded-2xl bg-white p-6 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <p className="text-sm font-medium text-indigo-600">What's the passport?</p>
-        <h2 className="font-heading mt-1 text-xl font-semibold text-slate-900">
-          Your AI enablement journey, gamified
+        <h2 className="font-heading text-xl font-semibold text-slate-900">
+          Welcome to CS Scale's AI Tool Repository!
         </h2>
         <div className="mt-4 flex flex-col gap-3 text-sm text-slate-600">
           <p>
-            The passport tracks your progress through the customer lifecycle — Customer research,
-            AE outreach, Customer outreach, Meeting prep, Meeting, Post meeting, and Closing out
-            customer — plus three bonus phases (SBR, Customer organization, Resource gathering).
+            To get started, you can use your custom Tool Passport to guide you through setting up
+            AI tools that can support your customer engagement journey.
+          </p>
+          <p>
+            The passport tracks your progress through the customer lifecycle, plus three bonus
+            phases (SBR, Customer organization, Resource gathering).
           </p>
           <p>
             Each phase has suggested AI tools. Use one, then hit <strong>"I used this"</strong> on
@@ -28,9 +30,13 @@ export function PassportIntroModal({ onClose }: PassportIntroModalProps) {
             complete.
           </p>
           <p>
-            It's entirely self-reported — there's no verification step. It's just a way to track
+            It's entirely self-reported: there's no verification step. It's just a way to track
             where you've adopted AI in your workflow, and a nudge toward phases you haven't tried
             yet.
+          </p>
+          <p>
+            Your tools are saved in "My Tools," so you can access the ones you like whenever you
+            want to go back to them and add your own.
           </p>
         </div>
         <button

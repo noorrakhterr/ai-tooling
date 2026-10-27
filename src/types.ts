@@ -37,6 +37,20 @@ export interface Recording {
   transcript?: string
 }
 
+export interface ToolUsage {
+  id: string
+  toolId: string
+  userEmail: string
+}
+
+export interface ToolComment {
+  id: string
+  toolId: string
+  userEmail: string
+  body: string
+  createdAt: string
+}
+
 export interface ReferenceResource {
   id: string
   title: string

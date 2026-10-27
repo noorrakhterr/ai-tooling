@@ -17,6 +17,13 @@
  * - That internal gateway rejects IDDB_ANON_KEY ("invalid API key for
  *   this tenant") — it wants IDDB_RESOURCE_KEY, the credential meant for
  *   pod-to-pod calls, not the public-facing anon key.
+ *
+ * Also confirmed via a real deployed request: OAP's edge gate forwards
+ * the authenticated user's email as the x-iddb-user-email header on every
+ * request that reaches this server (nobody gets here without passing
+ * that gate first — a direct unauthenticated request gets a 403 before
+ * ever reaching this app). That's the trusted identity source for the
+ * engagement features below.
  */
 import express from 'express'
 import path from 'path'
@@ -53,7 +60,18 @@ async function restRequest(path, init = {}) {
   return { ok: response.ok, status: response.status, json }
 }
 
-function tableRoutes(tableName) {
+/**
+ * @param {string} tableName
+ * @param {{ stampUserEmailField?: string, ownerEmailField?: string }} [options]
+ *   stampUserEmailField: on POST, overwrite this field in the body with the
+ *   trusted x-iddb-user-email header value — the browser can send anything
+ *   and it's ignored, so nobody can post "as" someone else.
+ *   ownerEmailField: on DELETE, only succeeds if the row's value for this
+ *   field matches the requester's email — a mismatch just deletes 0 rows
+ *   (plain 204), not an error that would leak whether the row exists.
+ */
+function tableRoutes(tableName, options = {}) {
+  const { stampUserEmailField, ownerEmailField } = options
   const router = express.Router()
 
   router.get('/', async (_req, res) => {
@@ -63,9 +81,12 @@ function tableRoutes(tableName) {
   })
 
   router.post('/', async (req, res) => {
+    const body = stampUserEmailField
+      ? { ...req.body, [stampUserEmailField]: req.headers['x-iddb-user-email'] || null }
+      : req.body
     const result = await restRequest(`/${tableName}`, {
       method: 'POST',
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(body),
     })
     if (!result.ok) return res.status(result.status).json({ error: result.json })
     res.status(201).json(Array.isArray(result.json) ? result.json[0] : result.json)
@@ -81,9 +102,12 @@ function tableRoutes(tableName) {
   })
 
   router.delete('/:id', async (req, res) => {
-    const result = await restRequest(`/${tableName}?id=eq.${req.params.id}`, {
-      method: 'DELETE',
-    })
+    let filterPath = `/${tableName}?id=eq.${req.params.id}`
+    if (ownerEmailField) {
+      const userEmail = req.headers['x-iddb-user-email'] || ''
+      filterPath += `&${ownerEmailField}=eq.${encodeURIComponent(userEmail)}`
+    }
+    const result = await restRequest(filterPath, { method: 'DELETE' })
     if (!result.ok) return res.status(result.status).json({ error: result.json })
     res.status(204).end()
   })
@@ -93,29 +117,17 @@ function tableRoutes(tableName) {
 
 app.use('/api/ai_tools', tableRoutes('ai_tools'))
 app.use('/api/gong_recordings', tableRoutes('gong_recordings'))
+app.use(
+  '/api/tool_usage',
+  tableRoutes('tool_usage', { stampUserEmailField: 'userEmail', ownerEmailField: 'userEmail' }),
+)
+app.use(
+  '/api/tool_comments',
+  tableRoutes('tool_comments', { stampUserEmailField: 'userEmail', ownerEmailField: 'userEmail' }),
+)
 
-// TEMPORARY DIAGNOSTIC — checking whether/how OAP forwards the
-// authenticated user's identity to this server, for the comments/ratings
-// feature. Logs header NAMES only (never values) plus JWT claim NAMES if
-// an Authorization bearer token is present. Remove once answered.
-app.get('/api/_whoami', (req, res) => {
-  const headerNames = Object.keys(req.headers)
-  let jwtClaimNames = null
-  const auth = req.headers['authorization']
-  if (auth?.startsWith('Bearer ')) {
-    try {
-      const payload = auth.split('.')[1]
-      if (payload) {
-        const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'))
-        jwtClaimNames = Object.keys(decoded)
-      }
-    } catch {
-      jwtClaimNames = 'present but not a decodable JWT'
-    }
-  }
-  console.log(`whoami headers: ${headerNames.join(',')}`)
-  console.log(`whoami jwt claim names: ${JSON.stringify(jwtClaimNames)}`)
-  res.json({ headerNames, jwtClaimNames })
+app.get('/api/me', (req, res) => {
+  res.json({ email: req.headers['x-iddb-user-email'] || null })
 })
 
 const distDir = path.join(__dirname, 'dist')

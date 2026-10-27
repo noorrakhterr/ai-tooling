@@ -45,6 +45,20 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<IddbRes
   }
 }
 
+/**
+ * Current authenticated user's email, as trusted server-side from the
+ * OAP edge's x-iddb-user-email header. Null if unavailable.
+ */
+export async function getMe(): Promise<{ email: string | null }> {
+  try {
+    const response = await fetch('/api/me')
+    const json = await response.json()
+    return { email: json?.email ?? null }
+  } catch {
+    return { email: null }
+  }
+}
+
 export const iddb = {
   table<Row>(name: string) {
     return {

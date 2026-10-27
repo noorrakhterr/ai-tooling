@@ -1,7 +1,18 @@
 import { useState } from 'react'
-import type { Tool } from '../types'
+import type { Tool, ToolComment } from '../types'
 import { usePassportStore } from '../state/usePassportStore'
 import { iddb } from '../lib/iddb'
+import { ToolComments } from './ToolComments'
+
+interface ToolCardEngagement {
+  usageCount: number
+  isUsingIt: boolean
+  onToggleUsage: () => void
+  comments: ToolComment[]
+  currentUserEmail: string | null
+  onAddComment: (body: string) => Promise<{ error: { message: string } | null }>
+  onDeleteComment: (commentId: string) => Promise<{ error: { message: string } | null }>
+}
 
 interface ToolCardProps {
   tool: Tool
@@ -10,6 +21,8 @@ interface ToolCardProps {
   /** When set, shows Edit/Delete controls for this tool (the shared catalog, not local-only entries). */
   onEdit?: (tool: Tool) => void
   onDeleted?: (id: string) => void
+  /** When set, shows the team "I use this" toggle + comments section. Only CatalogPage passes this. */
+  engagement?: ToolCardEngagement
 }
 
 const TYPE_STYLES: Record<Tool['type'], string> = {
@@ -22,7 +35,7 @@ const TYPE_STYLES: Record<Tool['type'], string> = {
   Other: 'bg-slate-100 text-slate-700',
 }
 
-export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted }: ToolCardProps) {
+export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }: ToolCardProps) {
   const isToolFavorited = usePassportStore((state) => state.isToolFavorited)
   const toggleFavorite = usePassportStore((state) => state.toggleFavorite)
   const stampPhase = usePassportStore((state) => state.stampPhase)
@@ -74,6 +87,36 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted }: ToolCardPr
         </button>
       </div>
       <p className="text-sm text-slate-600">{tool.description}</p>
+      {engagement && !tool.comingSoon && (
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs text-slate-500">
+            {engagement.usageCount === 0
+              ? 'No teammates using this yet'
+              : `${engagement.usageCount} teammate${engagement.usageCount === 1 ? '' : 's'} using this`}
+          </span>
+          <button
+            type="button"
+            onClick={engagement.onToggleUsage}
+            aria-pressed={engagement.isUsingIt}
+            className={[
+              'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
+              engagement.isUsingIt
+                ? 'bg-teal-100 text-teal-800'
+                : 'bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-700',
+            ].join(' ')}
+          >
+            {engagement.isUsingIt ? 'Using it ✓' : 'I use this'}
+          </button>
+        </div>
+      )}
+      {engagement && (
+        <ToolComments
+          comments={engagement.comments}
+          currentUserEmail={engagement.currentUserEmail}
+          onAdd={engagement.onAddComment}
+          onDelete={engagement.onDeleteComment}
+        />
+      )}
       <div className="mt-auto flex items-center justify-between gap-2 pt-1">
         {tool.comingSoon ? (
           <span className="text-sm font-medium text-slate-400">Not yet available</span>

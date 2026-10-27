@@ -13,12 +13,18 @@ function fileToDataUrl(file: File): Promise<string> {
   })
 }
 
-export function CustomToolUploadForm() {
+interface CustomToolUploadFormProps {
+  /** When set, this phase is pre-checked on mount. */
+  initialPhaseId?: string
+}
+
+export function CustomToolUploadForm({ initialPhaseId }: CustomToolUploadFormProps) {
   const addCustomTool = usePassportStore((state) => state.addCustomTool)
+  const stampPhase = usePassportStore((state) => state.stampPhase)
 
   const [name, setName] = useState('')
   const [file, setFile] = useState<File | null>(null)
-  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>([])
+  const [selectedPhaseIds, setSelectedPhaseIds] = useState<string[]>(initialPhaseId ? [initialPhaseId] : [])
   const [error, setError] = useState<string | null>(null)
 
   const togglePhase = (phaseId: string) => {
@@ -60,6 +66,7 @@ export function CustomToolUploadForm() {
       addedAt: new Date().toISOString(),
     }
     addCustomTool(tool)
+    selectedPhaseIds.forEach((phaseId) => stampPhase(phaseId))
 
     setName('')
     setFile(null)

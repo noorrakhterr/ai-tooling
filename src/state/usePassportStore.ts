@@ -10,6 +10,10 @@ interface PassportState {
   passportDismissed: boolean
   /** Whether the user has seen (or dismissed) the "what is the passport" intro popup. */
   hasSeenPassportIntro: boolean
+  /** Whether the user has seen each page's own "how to use this page" guide. */
+  hasSeenCatalogGuide: boolean
+  hasSeenGongGuide: boolean
+  hasSeenMyToolsGuide: boolean
   stampPhase: (phaseId: string) => void
   unstampPhase: (phaseId: string) => void
   toggleFavorite: (toolId: string) => void
@@ -19,6 +23,9 @@ interface PassportState {
   removeCustomTool: (toolId: string) => void
   dismissPassport: () => void
   markPassportIntroSeen: () => void
+  markCatalogGuideSeen: () => void
+  markGongGuideSeen: () => void
+  markMyToolsGuideSeen: () => void
 }
 
 export const usePassportStore = create<PassportState>()(
@@ -29,6 +36,9 @@ export const usePassportStore = create<PassportState>()(
       customTools: [],
       passportDismissed: false,
       hasSeenPassportIntro: false,
+      hasSeenCatalogGuide: false,
+      hasSeenGongGuide: false,
+      hasSeenMyToolsGuide: false,
       stampPhase: (phaseId) =>
         set((state) => ({
           stampedPhaseIds: state.stampedPhaseIds.includes(phaseId)
@@ -52,6 +62,9 @@ export const usePassportStore = create<PassportState>()(
         set((state) => ({ customTools: state.customTools.filter((tool) => tool.id !== toolId) })),
       dismissPassport: () => set({ passportDismissed: true }),
       markPassportIntroSeen: () => set({ hasSeenPassportIntro: true }),
+      markCatalogGuideSeen: () => set({ hasSeenCatalogGuide: true }),
+      markGongGuideSeen: () => set({ hasSeenGongGuide: true }),
+      markMyToolsGuideSeen: () => set({ hasSeenMyToolsGuide: true }),
     }),
     { name: 'ai-tooling-passport' },
   ),

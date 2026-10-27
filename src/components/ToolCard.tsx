@@ -42,8 +42,13 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
   const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
   const [deleting, setDeleting] = useState(false)
 
-  const favorited = isToolFavorited(tool.id)
+  const favorited = engagement ? engagement.isUsingIt : isToolFavorited(tool.id)
   const phaseStamped = phaseIdToStamp ? isPhaseStamped(phaseIdToStamp) : false
+
+  const handleToggleStar = () => {
+    toggleFavorite(tool.id)
+    engagement?.onToggleUsage()
+  }
 
   const handleDelete = async () => {
     if (!window.confirm(`Delete "${tool.name}" for everyone? This can't be undone.`)) return
@@ -75,7 +80,7 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
         </div>
         <button
           type="button"
-          onClick={() => toggleFavorite(tool.id)}
+          onClick={handleToggleStar}
           aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
           aria-pressed={favorited}
           className={[
@@ -88,26 +93,11 @@ export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }
       </div>
       <p className="text-sm text-slate-600">{tool.description}</p>
       {engagement && !tool.comingSoon && (
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-slate-500">
-            {engagement.usageCount === 0
-              ? 'No teammates using this yet'
-              : `${engagement.usageCount} teammate${engagement.usageCount === 1 ? '' : 's'} using this`}
-          </span>
-          <button
-            type="button"
-            onClick={engagement.onToggleUsage}
-            aria-pressed={engagement.isUsingIt}
-            className={[
-              'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
-              engagement.isUsingIt
-                ? 'bg-teal-100 text-teal-800'
-                : 'bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-700',
-            ].join(' ')}
-          >
-            {engagement.isUsingIt ? 'Using it ✓' : 'I use this'}
-          </button>
-        </div>
+        <p className="text-xs text-slate-500">
+          {engagement.usageCount === 0
+            ? 'No teammates using this yet'
+            : `${engagement.usageCount} teammate${engagement.usageCount === 1 ? '' : 's'} using this`}
+        </p>
       )}
       {engagement && (
         <ToolComments

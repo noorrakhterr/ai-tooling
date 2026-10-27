@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ALL_PHASES } from '../data/phases'
 import { useTools } from '../hooks/useTools'
 import { useEngagement } from '../hooks/useEngagement'
 import { ToolCard } from '../components/ToolCard'
 import { AddAiToolForm } from '../components/AddAiToolForm'
 import { EmptyState } from '../components/EmptyState'
+import { GuideModal } from '../components/GuideModal'
+import { usePassportStore } from '../state/usePassportStore'
 import type { Tool } from '../types'
 
 export function CatalogPage() {
@@ -14,6 +17,18 @@ export function CatalogPage() {
   const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
   const [sortByMostUsed, setSortByMostUsed] = useState(false)
+  const [searchParams] = useSearchParams()
+  const openAddFromPhase = searchParams.get('openAdd') === '1'
+  const initialPhaseId = searchParams.get('phase') ?? undefined
+
+  const hasSeenCatalogGuide = usePassportStore((state) => state.hasSeenCatalogGuide)
+  const markCatalogGuideSeen = usePassportStore((state) => state.markCatalogGuideSeen)
+  const [guideOpen, setGuideOpen] = useState(!hasSeenCatalogGuide)
+
+  const closeGuide = () => {
+    setGuideOpen(false)
+    markCatalogGuideSeen()
+  }
 
   const displayedTools = useMemo(() => {
     const matches = tools.filter((tool) => {
@@ -31,15 +46,37 @@ export function CatalogPage() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Some entries are validated and ready to use; others are placeholders pending the full AI
-            &amp; Gong resource inventory.
-          </p>
+        <div className="flex items-center gap-2">
+          <div>
+            <h1 className="text-xl font-semibold text-slate-900">Tool Catalog</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Some entries are validated and ready to use; others are placeholders pending the full AI
+              &amp; Gong resource inventory.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            aria-label="How to use the Tool Catalog"
+            title="How to use the Tool Catalog"
+            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+          >
+            ?
+          </button>
         </div>
-        {!editingTool && <AddAiToolForm onAdded={addTool} />}
+        {!editingTool && !openAddFromPhase && <AddAiToolForm onAdded={addTool} />}
       </div>
+
+      {guideOpen && (
+        <GuideModal title="Using the Tool Catalog" onClose={closeGuide}>
+          <p>
+            Sort tools by filters or search. Click the star to add to My Tools. When you click "My
+            Tools," the site indicates that you use this tool. You can also leave a comment on a
+            tool you have feedback for or want to show appreciation for.
+          </p>
+          <p>You can also add a tool to our repository by clicking Add AI Tool.</p>
+        </GuideModal>
+      )}
 
       {editingTool && (
         <AddAiToolForm
@@ -52,6 +89,8 @@ export function CatalogPage() {
           onCancelEdit={() => setEditingTool(null)}
         />
       )}
+
+      {!editingTool && openAddFromPhase && <AddAiToolForm onAdded={addTool} initialPhaseId={initialPhaseId} />}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <input

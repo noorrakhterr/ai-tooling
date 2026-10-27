@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ALL_PHASES } from '../data/phases'
 import { useTools } from '../hooks/useTools'
 import { usePassportStore } from '../state/usePassportStore'
@@ -5,6 +7,7 @@ import { ToolCard } from '../components/ToolCard'
 import { CustomToolCard } from '../components/CustomToolCard'
 import { CustomToolUploadForm } from '../components/CustomToolUploadForm'
 import { EmptyState } from '../components/EmptyState'
+import { GuideModal } from '../components/GuideModal'
 
 export function MyToolsPage() {
   const { tools } = useTools()
@@ -15,20 +18,52 @@ export function MyToolsPage() {
   const unassignedCustomTools = customTools.filter((tool) => tool.phaseIds.length === 0)
   const hasAnyTools = favoriteTools.length > 0 || customTools.length > 0
 
+  const [searchParams] = useSearchParams()
+  const initialPhaseId = searchParams.get('phase') ?? undefined
+
+  const hasSeenMyToolsGuide = usePassportStore((state) => state.hasSeenMyToolsGuide)
+  const markMyToolsGuideSeen = usePassportStore((state) => state.markMyToolsGuideSeen)
+  const [guideOpen, setGuideOpen] = useState(!hasSeenMyToolsGuide)
+
+  const closeGuide = () => {
+    setGuideOpen(false)
+    markMyToolsGuideSeen()
+  }
+
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">My Tools</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Favorited catalog tools and your own uploaded tools, grouped by lifecycle phase.
-        </p>
+      <div className="flex items-center gap-2">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">My Tools</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Favorited catalog tools and your own uploaded tools, grouped by lifecycle phase.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          aria-label="How to use My Tools"
+          title="How to use My Tools"
+          className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+        >
+          ?
+        </button>
       </div>
+
+      {guideOpen && (
+        <GuideModal title="Using My Tools" onClose={closeGuide}>
+          <p>
+            This holds all the tools you've starred for easy access. You can also add your own
+            tool here without having it be shared with the entire team.
+          </p>
+        </GuideModal>
+      )}
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
           Upload your own tool
         </h2>
-        <CustomToolUploadForm />
+        <CustomToolUploadForm initialPhaseId={initialPhaseId} />
       </section>
 
       {!hasAnyTools ? (

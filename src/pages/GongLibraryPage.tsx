@@ -3,6 +3,8 @@ import { useRecordings } from '../hooks/useRecordings'
 import { RecordingCard } from '../components/RecordingCard'
 import { AddGongCallForm } from '../components/AddGongCallForm'
 import { EmptyState } from '../components/EmptyState'
+import { GuideModal } from '../components/GuideModal'
+import { usePassportStore } from '../state/usePassportStore'
 import type { Recording } from '../types'
 
 export function GongLibraryPage() {
@@ -10,6 +12,15 @@ export function GongLibraryPage() {
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState<string | 'all'>('all')
   const [editingRecording, setEditingRecording] = useState<Recording | null>(null)
+
+  const hasSeenGongGuide = usePassportStore((state) => state.hasSeenGongGuide)
+  const markGongGuideSeen = usePassportStore((state) => state.markGongGuideSeen)
+  const [guideOpen, setGuideOpen] = useState(!hasSeenGongGuide)
+
+  const closeGuide = () => {
+    setGuideOpen(false)
+    markGongGuideSeen()
+  }
 
   const allLabels = useMemo(() => {
     const labels = new Set<string>()
@@ -32,14 +43,34 @@ export function GongLibraryPage() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Searchable call recording library, filterable by label.
-          </p>
+        <div className="flex items-center gap-2">
+          <div>
+            <h1 className="text-xl font-semibold text-slate-900">Gong Library</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Searchable call recording library, filterable by label.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            aria-label="How to use the Gong Library"
+            title="How to use the Gong Library"
+            className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+          >
+            ?
+          </button>
         </div>
         {!editingRecording && <AddGongCallForm onAdded={addRecording} />}
       </div>
+
+      {guideOpen && (
+        <GuideModal title="Using the Gong Library" onClose={closeGuide}>
+          <p>
+            Access the team's useful Gong calls. Filter or search at the top. You can add a call
+            of your own or one you found useful by clicking Add Gong Call.
+          </p>
+        </GuideModal>
+      )}
 
       {editingRecording && (
         <AddGongCallForm

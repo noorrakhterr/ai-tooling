@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { Sidebar } from './components/Sidebar'
+import { TopNav } from './components/TopNav'
 import { PassportBanner } from './components/PassportBanner'
 import { HomePage } from './pages/HomePage'
 import { PassportPage } from './pages/PassportPage'
@@ -15,8 +15,8 @@ function App() {
   const showBanner = !ROUTES_WITHOUT_BANNER.includes(location.pathname)
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Sidebar />
+    <div className="flex min-h-screen flex-col bg-slate-50">
+      <TopNav />
       <main className="min-w-0 flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-5xl">
           {showBanner && <PassportBanner />}

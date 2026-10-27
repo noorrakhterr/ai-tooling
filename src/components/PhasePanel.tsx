@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { Phase } from '../types'
 import { usePassportStore } from '../state/usePassportStore'
 import { useTools } from '../hooks/useTools'
@@ -39,6 +40,21 @@ export function PhasePanel({ phase, embedded = false }: PhasePanelProps) {
           ))}
         </div>
       )}
+      <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+        <span>Add my own tool:</span>
+        <Link
+          to={`/catalog?openAdd=1&phase=${phase.id}`}
+          className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600 transition-colors hover:bg-slate-200"
+        >
+          Public
+        </Link>
+        <Link
+          to={`/my-tools?openAdd=1&phase=${phase.id}`}
+          className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600 transition-colors hover:bg-slate-200"
+        >
+          Private
+        </Link>
+      </div>
     </div>
   )
 }

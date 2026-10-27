@@ -46,13 +46,13 @@ export function ToolComments({ comments, currentUserEmail, onAdd, onDelete }: To
         onClick={() => setOpen((current) => !current)}
         className="text-xs font-medium text-slate-500 hover:text-slate-700"
       >
-        {comments.length > 0 ? `💬 ${comments.length} tip${comments.length === 1 ? '' : 's'}` : 'Leave a tip'}
+        {comments.length > 0 ? `💬 ${comments.length} note${comments.length === 1 ? '' : 's'}` : 'Leave a note'}
       </button>
 
       {open && (
         <div className="mt-2 flex flex-col gap-2">
           {sortedComments.length === 0 ? (
-            <p className="text-xs text-slate-400">No tips yet — be the first to share one.</p>
+            <p className="text-xs text-slate-400">No notes yet — be the first to share one.</p>
           ) : (
             sortedComments.map((comment) => (
               <div key={comment.id} className="rounded-lg bg-slate-50 p-2">
@@ -80,7 +80,7 @@ export function ToolComments({ comments, currentUserEmail, onAdd, onDelete }: To
             <textarea
               value={body}
               onChange={(event) => setBody(event.target.value)}
-              placeholder="Share a tip or what you liked about this tool…"
+              placeholder="Share a note or what you liked about this tool…"
               rows={2}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />

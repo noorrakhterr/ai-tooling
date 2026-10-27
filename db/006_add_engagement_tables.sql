@@ -15,6 +15,16 @@
 -- userEmail is never trusted from the browser — the server (server.js's
 -- tableRoutes stampUserEmailField option) always overwrites it from the
 -- OAP edge's x-iddb-user-email header before the INSERT reaches here.
+--
+-- IMPORTANT, learned again the hard way after shipping this: running this
+-- SQL file alone is NOT enough. The RLS policies below only control what
+-- Postgres allows once a query already has a grant — this app's own
+-- dedicated role (iddb_a_0f9f634c5972) separately needs an OAP resource
+-- grant applied for each new table, same requirement ai_tools/
+-- gong_recordings had originally. Confirmed via a real deployed request
+-- that failed with IDDB_GRANT_MISSING until this ran:
+--   iddb grants apply app repository --table tool_usage,tool_comments \
+--     --priv SELECT,INSERT,UPDATE,DELETE --tenant ai-tools
 
 CREATE TABLE tool_usage (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

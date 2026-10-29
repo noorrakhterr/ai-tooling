@@ -11,10 +11,13 @@ interface PhasePanelProps {
 }
 
 export function PhasePanel({ phase, embedded = false }: PhasePanelProps) {
-  const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
+  // Select the array itself, not the isPhaseStamped function — a stable
+  // function reference never changes, so selecting it wouldn't re-render
+  // this component when stampedPhaseIds actually updates.
+  const stampedPhaseIds = usePassportStore((state) => state.stampedPhaseIds)
   const { tools } = useTools()
   const suggestedTools = tools.filter((tool) => tool.phaseIds.includes(phase.id))
-  const stamped = isPhaseStamped(phase.id)
+  const stamped = stampedPhaseIds.includes(phase.id)
 
   return (
     <div className={embedded ? '' : 'rounded-2xl border border-slate-200 bg-white p-5'}>

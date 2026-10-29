@@ -14,9 +14,15 @@ interface RecordingCardProps {
 
 export function RecordingCard({ recording, onEdit, onDeleted, showSaveForLater }: RecordingCardProps) {
   const [deleting, setDeleting] = useState(false)
-  const isRecordingSaved = usePassportStore((state) => state.isRecordingSaved)
+  // Select the actual data, not an accessor function — selecting a stable
+  // function reference (e.g. state.isRecordingSaved) never changes across
+  // renders, so Zustand never re-renders this component when
+  // savedRecordingIds updates. The click handler worked fine either way
+  // (the store genuinely updated), but the star's fill never visually
+  // reflected it until some unrelated re-render happened to occur.
+  const savedRecordingIds = usePassportStore((state) => state.savedRecordingIds)
   const toggleSavedRecording = usePassportStore((state) => state.toggleSavedRecording)
-  const saved = isRecordingSaved(recording.id)
+  const saved = savedRecordingIds.includes(recording.id)
 
   const handleDelete = async () => {
     if (!window.confirm(`Delete "${recording.title}" for everyone? This can't be undone.`)) return

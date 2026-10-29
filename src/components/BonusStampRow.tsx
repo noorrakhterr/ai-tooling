@@ -10,7 +10,9 @@ interface BonusStampRowProps {
 }
 
 export function BonusStampRow({ phases, selectedPhaseId, onSelectPhase, interactive = true }: BonusStampRowProps) {
-  const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
+  // Select the array, not isPhaseStamped — selecting a stable function
+  // reference never re-renders this component when stampedPhaseIds updates.
+  const stampedPhaseIds = usePassportStore((state) => state.stampedPhaseIds)
 
   return (
     <div>
@@ -19,7 +21,7 @@ export function BonusStampRow({ phases, selectedPhaseId, onSelectPhase, interact
       </p>
       <div className="flex flex-wrap gap-2">
         {phases.map((phase) => {
-          const stamped = isPhaseStamped(phase.id)
+          const stamped = stampedPhaseIds.includes(phase.id)
           const isSelected = selectedPhaseId === phase.id
           const className = [
             'flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium',

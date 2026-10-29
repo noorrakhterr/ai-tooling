@@ -15,12 +15,14 @@ export function PassportPhaseStrip({
   onSelectPhase,
   interactive = true,
 }: PassportPhaseStripProps) {
-  const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
+  // Select the array, not isPhaseStamped — selecting a stable function
+  // reference never re-renders this component when stampedPhaseIds updates.
+  const stampedPhaseIds = usePassportStore((state) => state.stampedPhaseIds)
 
   return (
     <div className="flex flex-wrap gap-2">
       {phases.map((phase, index) => {
-        const stamped = isPhaseStamped(phase.id)
+        const stamped = stampedPhaseIds.includes(phase.id)
         const isSelected = selectedPhaseId === phase.id
         const className = [
           'flex min-w-[132px] flex-1 flex-col items-center gap-2 rounded-xl border px-3 py-3 text-center',

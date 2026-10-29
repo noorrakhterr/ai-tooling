@@ -38,6 +38,7 @@ const app = express()
 app.use(express.json())
 
 async function restRequest(path, init = {}) {
+  const startedAt = Date.now()
   const response = await fetch(`${REST_BASE}${path}`, {
     ...init,
     headers: {
@@ -54,6 +55,10 @@ async function restRequest(path, init = {}) {
   })
   const text = await response.text()
   const json = text ? JSON.parse(text) : null
+  const elapsedMs = Date.now() - startedAt
+  // TEMPORARY DIAGNOSTIC — chasing a reported ~20s load time on
+  // gong_recordings/ai_tools GETs. Remove once answered.
+  console.log(`restRequest ${init.method || 'GET'} ${REST_BASE}${path} -> ${response.status} in ${elapsedMs}ms`)
   if (!response.ok) {
     console.log(`restRequest ${REST_BASE}${path} -> ${response.status}: ${text}`)
   }

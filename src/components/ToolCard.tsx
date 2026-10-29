@@ -37,15 +37,20 @@ const TYPE_STYLES: Record<Tool['type'], string> = {
 }
 
 export function ToolCard({ tool, phaseIdToStamp, onEdit, onDeleted, engagement }: ToolCardProps) {
-  const isToolFavorited = usePassportStore((state) => state.isToolFavorited)
+  // Select the actual data arrays, not accessor functions — a function
+  // reference from the store never changes across renders, so Zustand
+  // would never re-render this component when favoriteToolIds/
+  // stampedPhaseIds update (confirmed as the real cause of the star not
+  // visually updating on RecordingCard; same pattern existed here too).
+  const favoriteToolIds = usePassportStore((state) => state.favoriteToolIds)
   const toggleFavorite = usePassportStore((state) => state.toggleFavorite)
   const stampPhase = usePassportStore((state) => state.stampPhase)
-  const isPhaseStamped = usePassportStore((state) => state.isPhaseStamped)
+  const stampedPhaseIds = usePassportStore((state) => state.stampedPhaseIds)
   const [deleting, setDeleting] = useState(false)
   const [showUndoStar, setShowUndoStar] = useState(false)
 
-  const favorited = engagement ? engagement.isUsingIt : isToolFavorited(tool.id)
-  const phaseStamped = phaseIdToStamp ? isPhaseStamped(phaseIdToStamp) : false
+  const favorited = engagement ? engagement.isUsingIt : favoriteToolIds.includes(tool.id)
+  const phaseStamped = phaseIdToStamp ? stampedPhaseIds.includes(phaseIdToStamp) : false
 
   const handleToggleStar = () => {
     const turningOn = !favorited

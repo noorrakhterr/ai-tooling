@@ -15,6 +15,13 @@ export function MyToolsPage() {
   const favoriteToolIds = usePassportStore((state) => state.favoriteToolIds)
   const customTools = usePassportStore((state) => state.customTools)
   const favoriteTools = tools.filter((tool) => favoriteToolIds.includes(tool.id))
+  // TEMPORARY DIAGNOSTIC — chasing a reported favorite-tools-not-matching
+  // bug on My Tools. Remove once answered.
+  console.log(
+    '[my-tools-debug] favoriteToolIds:', favoriteToolIds,
+    'tools ids:', tools.map((t) => t.id),
+    'favoriteTools:', favoriteTools.map((t) => t.name),
+  )
 
   const [phaseFilter, setPhaseFilter] = useState('all')
 

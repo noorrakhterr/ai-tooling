@@ -13,6 +13,13 @@ export function useTools() {
 
   const refresh = useCallback(async () => {
     const { data, error } = await iddb.table<Tool>('ai_tools').selectAll()
+    // TEMPORARY DIAGNOSTIC — chasing My Tools falling back to seed data
+    // while Catalog gets real data. Remove once answered.
+    if (error) {
+      console.log('[useTools-debug] selectAll error:', error)
+    } else {
+      console.log('[useTools-debug] selectAll ok, row count:', data?.length)
+    }
     setTools(error || !data ? SEED_TOOLS : data)
     setLoading(false)
   }, [])

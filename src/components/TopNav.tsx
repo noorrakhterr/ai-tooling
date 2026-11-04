@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { to: '/catalog', label: 'Tool Catalog' },
   { to: '/gong-library', label: 'Gong Library' },
   { to: '/my-tools', label: 'My Tools' },
-  { to: '/workflows', label: 'Workflows' },
+  // Workflows hidden from nav for now — route still exists at /workflows
 ]
 
 export function TopNav() {

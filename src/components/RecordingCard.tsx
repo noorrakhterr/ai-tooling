@@ -63,7 +63,6 @@ export function RecordingCard({ recording, onEdit, onDeleted, showSaveForLater }
         </p>
       )}
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <span>{recording.callDate}</span>
         {recording.labels.map((label) => (
           <span key={label} className={`rounded-full px-2 py-0.5 font-medium ${labelColor(label)}`}>
             {label}

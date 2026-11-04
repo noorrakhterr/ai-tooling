@@ -15,6 +15,7 @@ export function PhasePanel({ phase, embedded = false }: PhasePanelProps) {
   // function reference never changes, so selecting it wouldn't re-render
   // this component when stampedPhaseIds actually updates.
   const stampedPhaseIds = usePassportStore((state) => state.stampedPhaseIds)
+  const unstampPhase = usePassportStore((state) => state.unstampPhase)
   const { tools } = useTools()
   const suggestedTools = tools.filter((tool) => tool.phaseIds.includes(phase.id))
   const stamped = stampedPhaseIds.includes(phase.id)
@@ -27,9 +28,14 @@ export function PhasePanel({ phase, embedded = false }: PhasePanelProps) {
           <p className="mt-1 text-sm text-slate-600">{phase.description}</p>
         </div>
         {stamped && (
-          <span className="flex-shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-            Stamped ✓
-          </span>
+          <button
+            type="button"
+            onClick={() => unstampPhase(phase.id)}
+            className="flex-shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-200"
+            title="Click to remove stamp"
+          >
+            Stamped ✓ · Undo
+          </button>
         )}
       </div>
       {suggestedTools.length === 0 ? (

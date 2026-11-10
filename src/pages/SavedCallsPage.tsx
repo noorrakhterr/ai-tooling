@@ -4,6 +4,7 @@ import { RecordingCard } from '../components/RecordingCard'
 import { EmptyState } from '../components/EmptyState'
 import { FilterSelect } from '../components/FilterSelect'
 import { usePassportStore } from '../state/usePassportStore'
+import { GONG_CATEGORIES } from '../data/gongCategories'
 
 const ALL_CALLS = 'all'
 const NO_LABEL = '__no_label__'
@@ -16,12 +17,6 @@ export function SavedCallsPage() {
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState(ALL_CALLS)
   const [csmFilter, setCsmFilter] = useState(ALL_CALLS)
-
-  const allLabels = useMemo(() => {
-    const labels = new Set<string>()
-    savedRecordings.forEach((recording) => recording.labels.forEach((label) => labels.add(label)))
-    return [...labels].sort()
-  }, [savedRecordings])
 
   const allCsms = useMemo(() => {
     const owners = new Set<string>()
@@ -61,9 +56,9 @@ export function SavedCallsPage() {
         <FilterSelect value={labelFilter} onChange={setLabelFilter}>
           <option value={ALL_CALLS}>All calls</option>
           <option value={NO_LABEL}>No label</option>
-          {allLabels.map((label) => (
-            <option key={label} value={label}>
-              {label}
+          {GONG_CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
             </option>
           ))}
         </FilterSelect>

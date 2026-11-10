@@ -7,6 +7,8 @@ import { EmptyState } from '../components/EmptyState'
 import { GuideModal } from '../components/GuideModal'
 import { FilterSelect } from '../components/FilterSelect'
 import { usePassportStore } from '../state/usePassportStore'
+import { GONG_CATEGORIES, GONG_TIERS } from '../data/gongCategories'
+import type { GongTier } from '../data/gongCategories'
 import type { Recording } from '../types'
 
 const ALL_CALLS = 'all'
@@ -17,6 +19,7 @@ export function GongLibraryPage() {
   const [query, setQuery] = useState('')
   const [labelFilter, setLabelFilter] = useState(ALL_CALLS)
   const [csmFilter, setCsmFilter] = useState(ALL_CALLS)
+  const [tierFilter, setTierFilter] = useState<GongTier | typeof ALL_CALLS>(ALL_CALLS)
   const [editingRecording, setEditingRecording] = useState<Recording | null>(null)
 
   const hasSeenGongGuide = usePassportStore((state) => state.hasSeenGongGuide)
@@ -27,12 +30,6 @@ export function GongLibraryPage() {
     setGuideOpen(false)
     markGongGuideSeen()
   }
-
-  const allLabels = useMemo(() => {
-    const labels = new Set<string>()
-    recordings.forEach((recording) => recording.labels.forEach((label) => labels.add(label)))
-    return [...labels].sort()
-  }, [recordings])
 
   const allCsms = useMemo(() => {
     const owners = new Set<string>()
@@ -53,9 +50,10 @@ export function GongLibraryPage() {
         labelFilter === ALL_CALLS ||
         (labelFilter === NO_LABEL ? recording.labels.length === 0 : recording.labels.includes(labelFilter))
       const matchesCsm = csmFilter === ALL_CALLS || recording.owner === csmFilter
-      return matchesQuery && matchesLabel && matchesCsm
+      const matchesTier = tierFilter === ALL_CALLS || recording.labels.includes(tierFilter)
+      return matchesQuery && matchesLabel && matchesCsm && matchesTier
     })
-  }, [recordings, query, labelFilter, csmFilter])
+  }, [recordings, query, labelFilter, csmFilter, tierFilter])
 
   return (
     <div className="flex flex-col gap-5">
@@ -117,9 +115,9 @@ export function GongLibraryPage() {
         <FilterSelect value={labelFilter} onChange={setLabelFilter}>
           <option value={ALL_CALLS}>All calls</option>
           <option value={NO_LABEL}>No label</option>
-          {allLabels.map((label) => (
-            <option key={label} value={label}>
-              {label}
+          {GONG_CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
             </option>
           ))}
         </FilterSelect>
@@ -131,6 +129,31 @@ export function GongLibraryPage() {
             </option>
           ))}
         </FilterSelect>
+        <div className="flex flex-shrink-0 items-center gap-1 rounded-full bg-slate-100 p-1">
+          <button
+            type="button"
+            onClick={() => setTierFilter(ALL_CALLS)}
+            className={[
+              'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+              tierFilter === ALL_CALLS ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700',
+            ].join(' ')}
+          >
+            All tiers
+          </button>
+          {GONG_TIERS.map((tierOption) => (
+            <button
+              key={tierOption}
+              type="button"
+              onClick={() => setTierFilter(tierOption)}
+              className={[
+                'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                tierFilter === tierOption ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700',
+              ].join(' ')}
+            >
+              {tierOption}
+            </button>
+          ))}
+        </div>
       </div>
 
       {filteredRecordings.length === 0 ? (

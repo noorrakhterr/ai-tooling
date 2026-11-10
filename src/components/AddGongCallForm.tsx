@@ -2,6 +2,8 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Recording } from '../types'
 import { iddb } from '../lib/iddb'
+import { GONG_CATEGORIES, GONG_TIERS } from '../data/gongCategories'
+import type { GongTier } from '../data/gongCategories'
 
 interface AddGongCallFormProps {
   onAdded: (recording: Recording) => void
@@ -19,17 +21,43 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
   const [link, setLink] = useState(editingRecording?.link ?? '')
   const [customer, setCustomer] = useState(editingRecording?.customer ?? '')
   const [owner, setOwner] = useState(editingRecording?.owner ?? '')
-  const [labelsInput, setLabelsInput] = useState(editingRecording?.labels.join(', ') ?? '')
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    editingRecording?.labels.filter((label) => (GONG_CATEGORIES as readonly string[]).includes(label)) ?? [],
+  )
+  const [tier, setTier] = useState<GongTier | undefined>(
+    editingRecording?.labels.find((label) => (GONG_TIERS as readonly string[]).includes(label)) as
+      | GongTier
+      | undefined,
+  )
+  // Legacy free-text labels from before categories were standardized — kept
+  // as-is on edit rather than silently dropped, just no longer addable.
+  const [legacyLabels] = useState<string[]>(
+    editingRecording?.labels.filter(
+      (label) =>
+        !(GONG_CATEGORIES as readonly string[]).includes(label) && !(GONG_TIERS as readonly string[]).includes(label),
+    ) ?? [],
+  )
   const [transcript, setTranscript] = useState(editingRecording?.transcript ?? '')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((current) =>
+      current.includes(category) ? current.filter((c) => c !== category) : [...current, category],
+    )
+  }
+
+  const toggleTier = (nextTier: GongTier) => {
+    setTier((current) => (current === nextTier ? undefined : nextTier))
+  }
 
   const resetForm = () => {
     setTitle('')
     setLink('')
     setCustomer('')
     setOwner('')
-    setLabelsInput('')
+    setSelectedCategories([])
+    setTier(undefined)
     setTranscript('')
     setError(null)
   }
@@ -60,10 +88,7 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
       return
     }
 
-    const labels = labelsInput
-      .split(',')
-      .map((label) => label.trim())
-      .filter(Boolean)
+    const labels = [...selectedCategories, ...(tier ? [tier] : []), ...legacyLabels]
 
     const values = {
       title: title.trim(),
@@ -191,17 +216,50 @@ export function AddGongCallForm({ onAdded, editingRecording, onUpdated, onCancel
         </div>
 
         <div>
-          <label htmlFor="add-call-labels" className="text-xs font-semibold text-slate-700">
-            Labels (comma-separated)
-          </label>
-          <input
-            id="add-call-labels"
-            type="text"
-            value={labelsInput}
-            onChange={(event) => setLabelsInput(event.target.value)}
-            placeholder="e.g. FastPass, Device Assurance"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
-          />
+          <p className="text-xs font-semibold text-slate-700">Category (optional)</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {GONG_CATEGORIES.map((category) => {
+              const isSelected = selectedCategories.includes(category)
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => toggleCategory(category)}
+                  className={[
+                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                    isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                  ].join(' ')}
+                >
+                  {category}
+                </button>
+              )
+            })}
+          </div>
+          {legacyLabels.length > 0 && (
+            <p className="mt-2 text-xs text-slate-400">Also keeping existing label(s): {legacyLabels.join(', ')}</p>
+          )}
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold text-slate-700">Tier (optional)</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {GONG_TIERS.map((tierOption) => {
+              const isSelected = tier === tierOption
+              return (
+                <button
+                  key={tierOption}
+                  type="button"
+                  onClick={() => toggleTier(tierOption)}
+                  className={[
+                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                    isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                  ].join(' ')}
+                >
+                  {tierOption}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         <div>

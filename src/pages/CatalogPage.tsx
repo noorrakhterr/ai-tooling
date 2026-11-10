@@ -9,13 +9,16 @@ import { EmptyState } from '../components/EmptyState'
 import { GuideModal } from '../components/GuideModal'
 import { FilterSelect } from '../components/FilterSelect'
 import { usePassportStore } from '../state/usePassportStore'
-import type { Tool } from '../types'
+import type { Tool, ToolType } from '../types'
+
+const TOOL_TYPES: ToolType[] = ['Gem', 'Agent', 'Skill', 'Prompt', 'Notebook', 'Gong resource', 'Other']
 
 export function CatalogPage() {
   const { tools, addTool, updateTool, removeTool } = useTools()
   const engagement = useEngagement()
   const [query, setQuery] = useState('')
   const [phaseFilter, setPhaseFilter] = useState<string | 'all'>('all')
+  const [typeFilter, setTypeFilter] = useState<ToolType | 'all'>('all')
   const [editingTool, setEditingTool] = useState<Tool | null>(null)
   const [sortByMostUsed, setSortByMostUsed] = useState(false)
   const [searchParams] = useSearchParams()
@@ -38,11 +41,12 @@ export function CatalogPage() {
         tool.name.toLowerCase().includes(query.toLowerCase()) ||
         tool.description.toLowerCase().includes(query.toLowerCase())
       const matchesPhase = phaseFilter === 'all' || tool.phaseIds.includes(phaseFilter)
-      return matchesQuery && matchesPhase
+      const matchesType = typeFilter === 'all' || tool.type === typeFilter
+      return matchesQuery && matchesPhase && matchesType
     })
     if (!sortByMostUsed) return matches
     return [...matches].sort((a, b) => engagement.usageCountForTool(b.id) - engagement.usageCountForTool(a.id))
-  }, [tools, query, phaseFilter, sortByMostUsed, engagement])
+  }, [tools, query, phaseFilter, typeFilter, sortByMostUsed, engagement])
 
   return (
     <div className="flex flex-col gap-5">
@@ -100,6 +104,14 @@ export function CatalogPage() {
           {ALL_PHASES.map((phase) => (
             <option key={phase.id} value={phase.id}>
               {phase.title}
+            </option>
+          ))}
+        </FilterSelect>
+        <FilterSelect value={typeFilter} onChange={(value) => setTypeFilter(value as ToolType | 'all')}>
+          <option value="all">All types</option>
+          {TOOL_TYPES.map((toolType) => (
+            <option key={toolType} value={toolType}>
+              {toolType}
             </option>
           ))}
         </FilterSelect>

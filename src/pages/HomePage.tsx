@@ -1,10 +1,58 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { usePassportStore } from '../state/usePassportStore'
-import { PassportFull } from '../components/PassportFull'
+import { PassportHomePreview } from '../components/PassportHomePreview'
 import { ResourceLinksModal } from '../components/ResourceLinksModal'
 import { RESOURCES } from '../data/resources'
 import type { ReferenceResource } from '../types'
+
+function WelcomeIntroBox() {
+  const hasSeenPassportIntro = usePassportStore((state) => state.hasSeenPassportIntro)
+  const markPassportIntroSeen = usePassportStore((state) => state.markPassportIntroSeen)
+  const [expanded, setExpanded] = useState(!hasSeenPassportIntro)
+
+  const toggle = () => {
+    if (expanded) markPassportIntroSeen()
+    setExpanded((current) => !current)
+  }
+
+  return (
+    <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5">
+      <button type="button" onClick={toggle} className="flex w-full items-center justify-between gap-4 text-left">
+        <h2 className="font-heading text-base font-semibold text-slate-900">
+          Welcome to CS Scale's AI Tool Repository!
+        </h2>
+        <span className="flex-shrink-0 text-xs font-medium text-slate-500">{expanded ? 'Hide ▲' : 'Show ▼'}</span>
+      </button>
+      {expanded && (
+        <div className="mt-3 flex flex-col gap-2 text-sm text-slate-700">
+          <p>
+            To get started, you can use your custom Tool Passport to guide you through setting up
+            AI tools that can support your customer engagement journey.
+          </p>
+          <p>
+            The passport tracks your progress through the customer lifecycle, plus three bonus
+            phases (SBR, Customer organization, Resource gathering).
+          </p>
+          <p>
+            Each phase has suggested AI tools. Use one, then hit <strong>"I used this"</strong> on
+            that tool to stamp the phase. Stamp all seven core phases and your passport is
+            complete.
+          </p>
+          <p>
+            It's entirely self-reported: there's no verification step. It's just a way to track
+            where you've adopted AI in your workflow, and a nudge toward phases you haven't tried
+            yet.
+          </p>
+          <p>
+            Your tools are saved in "My Tools," so you can access the ones you like whenever you
+            want to go back to them and add your own.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function HomePage() {
   const passportDismissed = usePassportStore((state) => state.passportDismissed)
@@ -12,8 +60,10 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-10">
+      <WelcomeIntroBox />
+
       {!passportDismissed ? (
-        <PassportFull showPhaseDetail={false} />
+        <PassportHomePreview />
       ) : (
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Welcome</h1>

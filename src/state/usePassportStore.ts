@@ -16,6 +16,7 @@ interface PassportState {
   hasSeenCatalogGuide: boolean
   hasSeenGongGuide: boolean
   hasSeenMyToolsGuide: boolean
+  hasSeenPassportGuide: boolean
   stampPhase: (phaseId: string) => void
   unstampPhase: (phaseId: string) => void
   toggleFavorite: (toolId: string) => void
@@ -30,6 +31,7 @@ interface PassportState {
   markCatalogGuideSeen: () => void
   markGongGuideSeen: () => void
   markMyToolsGuideSeen: () => void
+  markPassportGuideSeen: () => void
 }
 
 export const usePassportStore = create<PassportState>()(
@@ -44,6 +46,7 @@ export const usePassportStore = create<PassportState>()(
       hasSeenCatalogGuide: false,
       hasSeenGongGuide: false,
       hasSeenMyToolsGuide: false,
+      hasSeenPassportGuide: false,
       stampPhase: (phaseId) =>
         set((state) => ({
           stampedPhaseIds: state.stampedPhaseIds.includes(phaseId)
@@ -77,6 +80,7 @@ export const usePassportStore = create<PassportState>()(
       markCatalogGuideSeen: () => set({ hasSeenCatalogGuide: true }),
       markGongGuideSeen: () => set({ hasSeenGongGuide: true }),
       markMyToolsGuideSeen: () => set({ hasSeenMyToolsGuide: true }),
+      markPassportGuideSeen: () => set({ hasSeenPassportGuide: true }),
     }),
     { name: 'ai-tooling-passport' },
   ),
